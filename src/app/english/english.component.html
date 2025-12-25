@@ -470,7 +470,7 @@
         <article
           *ngFor="let researcher of researchers; let i = index"
           [id]="researcher.name"
-          class="research-card group scroll-offset animate-on-scroll"
+          class="research-card group scroll-offset"
           [class.stagger-1]="i % 6 === 0"
           [class.stagger-2]="i % 6 === 1"
           [class.stagger-3]="i % 6 === 2"

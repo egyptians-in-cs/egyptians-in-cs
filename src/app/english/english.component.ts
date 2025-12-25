@@ -192,16 +192,6 @@ export class EnglishComponent implements OnInit, AfterViewInit {
   // Toggle compact/expanded view
   toggleViewMode(): void {
     this.compactView = !this.compactView;
-    this.cdr.detectChanges();
-    // Re-initialize scroll animations for new view with longer delay
-    setTimeout(() => {
-      this.initScrollAnimations();
-      // Also directly add visible class to ensure cards show
-      if (!this.compactView) {
-        const cards = document.querySelectorAll('.research-card');
-        cards.forEach(card => card.classList.add('visible'));
-      }
-    }, 100);
   }
 
   // Hover for map sync
