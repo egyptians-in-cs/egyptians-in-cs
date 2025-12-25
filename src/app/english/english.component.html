@@ -243,162 +243,6 @@
           </button>
         </div>
       </div>
-
-      <!-- Research Areas Tree Filter with Multi-Select -->
-      <div class="sidebar-panel overflow-hidden animate-on-scroll stagger-4">
-        <!-- Header -->
-        <div class="px-4 py-3 bg-navy-50 dark:bg-navy-900 border-b border-navy-100 dark:border-navy-700">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-navy-900 dark:text-navy-100 text-sm">
-              <i class="fas fa-sitemap text-navy-500 dark:text-navy-400 mr-2"></i>
-              Research Areas
-            </h3>
-            <div class="flex gap-1">
-              <button
-                (click)="expandAllTracks()"
-                class="p-1.5 text-navy-500 hover:bg-navy-100 dark:hover:bg-navy-700 rounded transition-colors"
-                title="Expand All">
-                <i class="fas fa-expand text-xs"></i>
-              </button>
-              <button
-                (click)="collapseAllTracks()"
-                class="p-1.5 text-navy-500 hover:bg-navy-100 dark:hover:bg-navy-700 rounded transition-colors"
-                title="Collapse All">
-                <i class="fas fa-compress text-xs"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Selected Areas Chips -->
-        <div *ngIf="selectedAreas.size > 0"
-             class="px-3 py-2 border-b border-navy-100 dark:border-navy-700 bg-gold-50/50 dark:bg-gold-400/5">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-navy-600 dark:text-navy-300">
-              {{ selectedAreas.size }} selected • {{ researchers.length }} researchers
-            </span>
-            <button
-              (click)="clearAreaSelection()"
-              class="text-xs text-red-500 hover:text-red-600 transition-colors font-medium">
-              Clear
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-1">
-            <span
-              *ngFor="let area of getSelectedAreasArray()"
-              class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium
-                     bg-gold-400 text-navy-900 rounded-full">
-              {{ area }}
-              <button
-                (click)="removeSelectedArea(area); $event.stopPropagation()"
-                class="hover:bg-navy-900/20 rounded-full p-0.5 transition-colors">
-                <i class="fas fa-times text-[9px]"></i>
-              </button>
-            </span>
-          </div>
-        </div>
-
-        <!-- Tree Content -->
-        <div class="max-h-[400px] overflow-y-auto scrollbar-academic pb-4">
-          <!-- All Researchers Option -->
-          <div class="p-2 border-b border-navy-100 dark:border-navy-700">
-            <div
-              (click)="clearAreaSelection()"
-              class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all
-                     hover:bg-navy-50 dark:hover:bg-navy-700/50"
-              [ngClass]="{'bg-teal-50 dark:bg-teal-500/10': selectedAreas.size === 0}">
-              <i class="fas fa-globe-americas text-teal-500"></i>
-              <span class="flex-1 font-medium text-sm text-navy-900 dark:text-navy-100">All Research Areas</span>
-              <span class="badge badge-teal text-xs">{{ profiles.length }}</span>
-            </div>
-          </div>
-
-          <!-- Main Tracks Tree -->
-          <div class="p-2">
-            <div *ngFor="let track of getMainTracks()" class="mb-1">
-              <!-- Track Header (Level 1) -->
-              <div class="flex items-center gap-1 px-2 py-1.5 rounded-lg
-                          hover:bg-navy-50 dark:hover:bg-navy-700/50 transition-colors">
-                <button
-                  (click)="toggleTrack(track)"
-                  class="w-6 h-6 flex items-center justify-center text-navy-400 hover:text-navy-600
-                         dark:text-navy-500 dark:hover:text-navy-300 transition-colors">
-                  <i class="fas text-xs"
-                     [ngClass]="isTrackExpanded(track) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
-                </button>
-                <i class="fas text-sm"
-                   [ngClass]="isTrackExpanded(track) ? 'fa-folder-open text-gold-500' : 'fa-folder text-gold-400'"></i>
-                <span class="flex-1 font-medium text-sm text-navy-800 dark:text-navy-200 truncate">{{ track }}</span>
-                <span class="text-xs px-1.5 py-0.5 rounded bg-navy-100 dark:bg-navy-700 text-navy-600 dark:text-navy-300">
-                  {{ getCount(track) }}
-                </span>
-              </div>
-
-              <!-- Subtracks (Level 2) -->
-              <div *ngIf="isTrackExpanded(track)" class="ml-4 pl-2 border-l-2 border-navy-200 dark:border-navy-600">
-                <div *ngFor="let subtrack of getSubtracks(track)" class="my-0.5">
-                  <!-- Subtrack Header -->
-                  <div class="flex items-center gap-1 px-2 py-1 rounded-lg
-                              hover:bg-navy-50 dark:hover:bg-navy-700/50 transition-colors">
-                    <button
-                      (click)="toggleSubtrack(track, subtrack)"
-                      class="w-5 h-5 flex items-center justify-center text-navy-400 hover:text-navy-600
-                             dark:text-navy-500 dark:hover:text-navy-300 transition-colors">
-                      <i class="fas text-[10px]"
-                         [ngClass]="isSubtrackExpanded(track, subtrack) ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
-                    </button>
-                    <i class="fas fa-layer-group text-teal-500 text-xs"></i>
-                    <span class="flex-1 text-sm text-navy-700 dark:text-navy-300 truncate">{{ subtrack }}</span>
-                    <span class="text-xs px-1.5 py-0.5 rounded bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                      {{ getCount(subtrack) }}
-                    </span>
-                  </div>
-
-                  <!-- Areas (Level 3) - with checkboxes -->
-                  <div *ngIf="isSubtrackExpanded(track, subtrack)"
-                       class="ml-4 pl-2 border-l border-dashed border-navy-200 dark:border-navy-600">
-                    <label
-                      *ngFor="let area of getAreas(track, subtrack)"
-                      class="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer
-                             transition-all duration-150 group
-                             hover:bg-navy-50 dark:hover:bg-navy-700/50"
-                      [ngClass]="{
-                        'bg-gold-50 dark:bg-gold-400/10': isAreaSelected(area),
-                        'opacity-50 cursor-not-allowed': getCount(area) === 0
-                      }">
-                      <input
-                        type="checkbox"
-                        [checked]="isAreaSelected(area)"
-                        [disabled]="getCount(area) === 0"
-                        (change)="toggleAreaSelection(area)"
-                        class="w-3.5 h-3.5 rounded border-navy-300 text-gold-500
-                               focus:ring-gold-400 focus:ring-1 cursor-pointer
-                               dark:border-navy-600 dark:bg-navy-700
-                               disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                      <i class="fas fa-tag text-[10px]"
-                         [ngClass]="isAreaSelected(area) ? 'text-gold-500' : 'text-navy-400 dark:text-navy-500'"></i>
-                      <span class="flex-1 text-xs truncate"
-                            [ngClass]="isAreaSelected(area)
-                              ? 'text-gold-700 dark:text-gold-400 font-medium'
-                              : 'text-navy-600 dark:text-navy-400'">
-                        {{ area }}
-                      </span>
-                      <span *ngIf="getCount(area) > 0"
-                            class="text-[10px] px-1 py-0.5 rounded"
-                            [ngClass]="isAreaSelected(area)
-                              ? 'bg-gold-200 text-gold-800 dark:bg-gold-400/20 dark:text-gold-300'
-                              : 'bg-navy-100 dark:bg-navy-700 text-navy-500 dark:text-navy-400'">
-                        {{ getCount(area) }}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </aside>
 
@@ -422,6 +266,150 @@
           [hoveredResearcher]="hoveredResearcher"
           mapId="english-map">
         </app-map>
+      </div>
+    </section>
+
+    <!-- Research Areas Filter Section -->
+    <section class="mb-6 glass-card p-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-navy-900 dark:text-navy-100 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center">
+            <i class="fas fa-sitemap text-white"></i>
+          </div>
+          <span>Filter by Research Area</span>
+          <span class="text-sm font-normal text-navy-500 dark:text-navy-400">
+            ({{ researchers.length }} researchers)
+          </span>
+        </h2>
+        <div class="flex items-center gap-2">
+          <button
+            (click)="expandAllTracks()"
+            class="px-3 py-1.5 text-sm text-navy-600 hover:bg-navy-100 dark:text-navy-300 dark:hover:bg-navy-700 rounded-lg transition-colors"
+            title="Expand All">
+            <i class="fas fa-expand mr-1"></i> Expand
+          </button>
+          <button
+            (click)="collapseAllTracks()"
+            class="px-3 py-1.5 text-sm text-navy-600 hover:bg-navy-100 dark:text-navy-300 dark:hover:bg-navy-700 rounded-lg transition-colors"
+            title="Collapse All">
+            <i class="fas fa-compress mr-1"></i> Collapse
+          </button>
+          <button
+            *ngIf="selectedAreas.size > 0"
+            (click)="clearAreaSelection()"
+            class="px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium">
+            <i class="fas fa-times mr-1"></i> Clear ({{ selectedAreas.size }})
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected Areas Chips -->
+      <div *ngIf="selectedAreas.size > 0" class="mb-4 flex flex-wrap gap-2">
+        <span
+          *ngFor="let area of getSelectedAreasArray()"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium
+                 bg-gold-400 text-navy-900 rounded-full shadow-sm">
+          {{ area }}
+          <button
+            (click)="removeSelectedArea(area); $event.stopPropagation()"
+            class="hover:bg-navy-900/20 rounded-full p-0.5 transition-colors">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </span>
+      </div>
+
+      <!-- All Areas Button -->
+      <div class="mb-4">
+        <button
+          (click)="clearAreaSelection()"
+          class="px-4 py-2 rounded-lg transition-all font-medium text-sm"
+          [ngClass]="selectedAreas.size === 0
+            ? 'bg-teal-500 text-white shadow-md'
+            : 'bg-navy-100 text-navy-700 hover:bg-navy-200 dark:bg-navy-700 dark:text-navy-300 dark:hover:bg-navy-600'">
+          <i class="fas fa-globe-americas mr-2"></i>
+          All Research Areas
+          <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+                [ngClass]="selectedAreas.size === 0 ? 'bg-white/20' : 'bg-navy-200 dark:bg-navy-600'">
+            {{ profiles.length }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Tracks Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div *ngFor="let track of getMainTracks()"
+             class="border border-navy-200 dark:border-navy-600 rounded-xl overflow-hidden bg-white/50 dark:bg-navy-800/50">
+          <!-- Track Header -->
+          <button
+            (click)="toggleTrack(track)"
+            class="w-full flex items-center gap-2 px-4 py-3 text-left
+                   hover:bg-navy-50 dark:hover:bg-navy-700/50 transition-colors">
+            <i class="fas text-sm"
+               [ngClass]="isTrackExpanded(track) ? 'fa-folder-open text-gold-500' : 'fa-folder text-gold-400'"></i>
+            <span class="flex-1 font-medium text-sm text-navy-800 dark:text-navy-200 truncate">{{ track }}</span>
+            <span class="text-xs px-2 py-1 rounded-full bg-navy-100 dark:bg-navy-700 text-navy-600 dark:text-navy-300">
+              {{ getCount(track) }}
+            </span>
+            <i class="fas text-xs text-navy-400"
+               [ngClass]="isTrackExpanded(track) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </button>
+
+          <!-- Expanded Content -->
+          <div *ngIf="isTrackExpanded(track)"
+               class="border-t border-navy-200 dark:border-navy-600 max-h-64 overflow-y-auto scrollbar-academic">
+            <div *ngFor="let subtrack of getSubtracks(track)" class="border-b border-navy-100 dark:border-navy-700 last:border-b-0">
+              <!-- Subtrack Header -->
+              <button
+                (click)="toggleSubtrack(track, subtrack)"
+                class="w-full flex items-center gap-2 px-4 py-2 text-left
+                       hover:bg-navy-50 dark:hover:bg-navy-700/50 transition-colors bg-navy-50/50 dark:bg-navy-800/50">
+                <i class="fas fa-layer-group text-teal-500 text-xs"></i>
+                <span class="flex-1 text-sm text-navy-700 dark:text-navy-300 truncate">{{ subtrack }}</span>
+                <span class="text-xs px-1.5 py-0.5 rounded bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400">
+                  {{ getCount(subtrack) }}
+                </span>
+                <i class="fas text-[10px] text-navy-400"
+                   [ngClass]="isSubtrackExpanded(track, subtrack) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </button>
+
+              <!-- Areas -->
+              <div *ngIf="isSubtrackExpanded(track, subtrack)" class="px-2 py-2 space-y-1 bg-white dark:bg-navy-900">
+                <label
+                  *ngFor="let area of getAreas(track, subtrack)"
+                  class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all
+                         hover:bg-navy-50 dark:hover:bg-navy-700/50"
+                  [ngClass]="{
+                    'bg-gold-50 dark:bg-gold-400/10 ring-1 ring-gold-400': isAreaSelected(area),
+                    'opacity-50 cursor-not-allowed': getCount(area) === 0
+                  }">
+                  <input
+                    type="checkbox"
+                    [checked]="isAreaSelected(area)"
+                    [disabled]="getCount(area) === 0"
+                    (change)="toggleAreaSelection(area)"
+                    class="w-4 h-4 rounded border-navy-300 text-gold-500
+                           focus:ring-gold-400 focus:ring-2 cursor-pointer
+                           dark:border-navy-600 dark:bg-navy-700"
+                  />
+                  <span class="flex-1 text-sm truncate"
+                        [ngClass]="isAreaSelected(area)
+                          ? 'text-gold-700 dark:text-gold-400 font-medium'
+                          : 'text-navy-600 dark:text-navy-400'">
+                    {{ area }}
+                  </span>
+                  <span *ngIf="getCount(area) > 0"
+                        class="text-xs px-1.5 py-0.5 rounded-full"
+                        [ngClass]="isAreaSelected(area)
+                          ? 'bg-gold-200 text-gold-800 dark:bg-gold-400/20 dark:text-gold-300'
+                          : 'bg-navy-100 dark:bg-navy-700 text-navy-500 dark:text-navy-400'">
+                    {{ getCount(area) }}
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
