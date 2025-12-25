@@ -192,6 +192,9 @@ export class EnglishComponent implements OnInit, AfterViewInit {
   // Toggle compact/expanded view
   toggleViewMode(): void {
     this.compactView = !this.compactView;
+    this.cdr.detectChanges();
+    // Re-initialize scroll animations for new view
+    setTimeout(() => this.initScrollAnimations(), 50);
   }
 
   // Hover for map sync
