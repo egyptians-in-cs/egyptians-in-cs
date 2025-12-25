@@ -8,7 +8,7 @@ import { ActivatedRoute, Router, RoutesRecognized  } from '@angular/router';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
-  title = 'Egyptians in AI';
+  title = 'Egyptians in CS';
   en_active: boolean = true;
   mobileMenuOpen: boolean = false;
   dropdownOpen: boolean = false;
