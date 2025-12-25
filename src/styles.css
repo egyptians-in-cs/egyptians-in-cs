@@ -305,28 +305,30 @@
     display: none;
   }
 
-  /* Custom academic scrollbar */
+  /* Custom academic scrollbar - more visible */
   .scrollbar-academic {
-    scrollbar-width: thin;
-    scrollbar-color: #bcccdc #f0f4f8;
+    scrollbar-width: auto;
+    scrollbar-color: #9fb3c8 #f0f4f8;
   }
 
   .scrollbar-academic::-webkit-scrollbar {
-    width: 8px;
+    width: 12px;
   }
 
   .scrollbar-academic::-webkit-scrollbar-track {
     @apply bg-navy-100 dark:bg-navy-800 rounded-full;
+    margin: 4px 0;
   }
 
   .scrollbar-academic::-webkit-scrollbar-thumb {
-    @apply bg-navy-300 dark:bg-navy-600 rounded-full;
-    border: 2px solid transparent;
+    @apply bg-navy-400 dark:bg-navy-500 rounded-full;
+    border: 3px solid transparent;
     background-clip: padding-box;
+    min-height: 40px;
   }
 
   .scrollbar-academic::-webkit-scrollbar-thumb:hover {
-    @apply bg-navy-400 dark:bg-navy-500;
+    @apply bg-gold-500;
   }
 
   .scrollbar-academic::-webkit-scrollbar-thumb:active {
