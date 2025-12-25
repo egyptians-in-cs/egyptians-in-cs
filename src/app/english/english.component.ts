@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { IResearcher, ICategoryHierarchy, ITaxonomy } from '../researchers';
 import people from '../../assets/researchers_en.json';
 import categoriesData from '../../assets/categories.json';
@@ -20,6 +20,14 @@ export class EnglishComponent implements OnInit {
   profiles = this.researchers;
   searchQuery = "";
   en_active: boolean = true;
+
+  // UI State
+  isLoading: boolean = true;
+  compactView: boolean = false;
+  showAutocomplete: boolean = false;
+  autocompleteResults: IResearcher[] = [];
+  hoveredResearcher: IResearcher | null = null;
+  activeFilters: {type: string, value: string, label: string}[] = [];
 
   // Standardized interests and categories
   stdInterests: {[key: string]: boolean} = {};
@@ -59,6 +67,138 @@ export class EnglishComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.loadLocations();
+    // Simulate loading for skeleton effect
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 500);
+  }
+
+  // Get initials for photo fallback
+  getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
+  // Generate background color from name
+  getInitialsColor(name: string): string {
+    const colors = [
+      'bg-navy-600', 'bg-teal-500', 'bg-gold-500',
+      'bg-navy-700', 'bg-teal-600', 'bg-gold-600'
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  }
+
+  // Search autocomplete
+  onSearchInput(event: any): void {
+    const query = event.target.value.toLowerCase();
+    this.searchQuery = query;
+
+    if (query.length >= 2) {
+      this.autocompleteResults = this.profiles
+        .filter(p => p.name.toLowerCase().includes(query))
+        .slice(0, 5);
+      this.showAutocomplete = this.autocompleteResults.length > 0;
+    } else {
+      this.showAutocomplete = false;
+      this.autocompleteResults = [];
+    }
+
+    this.researchers = this.filterService.filterProfiles(query, people);
+  }
+
+  // Select from autocomplete
+  selectAutocomplete(researcher: IResearcher): void {
+    this.searchQuery = researcher.name;
+    this.showAutocomplete = false;
+    this.researchers = [researcher];
+  }
+
+  // Hide autocomplete on click outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.search-container')) {
+      this.showAutocomplete = false;
+    }
+  }
+
+  // Toggle compact/expanded view
+  toggleViewMode(): void {
+    this.compactView = !this.compactView;
+  }
+
+  // Hover for map sync
+  onResearcherHover(researcher: IResearcher | null): void {
+    this.hoveredResearcher = researcher;
+  }
+
+  // Update active filters display
+  updateActiveFilters(): void {
+    this.activeFilters = [];
+
+    if (this.searchQuery) {
+      this.activeFilters.push({
+        type: 'search',
+        value: this.searchQuery,
+        label: `Search: "${this.searchQuery}"`
+      });
+    }
+
+    if (this.selectedMainTrack && this.selectedMainTrack !== 'all') {
+      this.activeFilters.push({
+        type: 'track',
+        value: this.selectedMainTrack,
+        label: this.selectedMainTrack
+      });
+    }
+
+    if (this.selectedSubtrack) {
+      this.activeFilters.push({
+        type: 'subtrack',
+        value: this.selectedSubtrack,
+        label: this.selectedSubtrack
+      });
+    }
+
+    if (this.selectedArea) {
+      this.activeFilters.push({
+        type: 'area',
+        value: this.selectedArea,
+        label: this.selectedArea
+      });
+    }
+  }
+
+  // Remove a specific filter
+  removeFilter(filter: {type: string, value: string, label: string}): void {
+    switch (filter.type) {
+      case 'search':
+        this.searchQuery = '';
+        this.researchers = this.filterService.sortShuffle([...this.profiles]);
+        break;
+      case 'track':
+        this.filterByMainTrack('all');
+        break;
+      case 'subtrack':
+        this.filterByMainTrack(this.selectedMainTrack);
+        break;
+      case 'area':
+        this.filterBySubtrack(this.selectedMainTrack, this.selectedSubtrack);
+        break;
+    }
+    this.updateActiveFilters();
+  }
+
+  // Clear all active filters
+  clearAllFilters(): void {
+    this.searchQuery = '';
+    this.clearFilters();
+    this.activeFilters = [];
   }
 
   async loadLocations(): Promise<void> {

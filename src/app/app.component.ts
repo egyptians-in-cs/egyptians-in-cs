@@ -1,5 +1,6 @@
 import { Component, ViewEncapsulation, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RoutesRecognized  } from '@angular/router';
+import { ThemeService } from './theme.service';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +13,16 @@ export class AppComponent implements OnInit {
   en_active: boolean = true;
   mobileMenuOpen: boolean = false;
   dropdownOpen: boolean = false;
+  isDarkMode: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) {
-
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private themeService: ThemeService
+  ) {
+    this.themeService.isDarkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
   }
 
   ngOnInit(): void {
@@ -40,5 +48,9 @@ export class AppComponent implements OnInit {
 
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
   }
 }

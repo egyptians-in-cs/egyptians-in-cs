@@ -1,1 +1,38 @@
-<div [id]="mapId" class="world-map"></div>
+<div class="map-container">
+  <!-- Zoom Region Buttons -->
+  <div class="zoom-controls">
+    <button
+      (click)="zoomToRegion('world')"
+      class="zoom-btn"
+      title="View World">
+      <i class="fas fa-globe"></i>
+    </button>
+    <button
+      (click)="zoomToRegion('usa')"
+      class="zoom-btn"
+      title="Zoom to USA">
+      USA
+    </button>
+    <button
+      (click)="zoomToRegion('europe')"
+      class="zoom-btn"
+      title="Zoom to Europe">
+      EU
+    </button>
+    <button
+      (click)="zoomToRegion('middleEast')"
+      class="zoom-btn"
+      title="Zoom to Middle East">
+      ME
+    </button>
+    <button
+      (click)="zoomToRegion('egypt')"
+      class="zoom-btn"
+      title="Zoom to Egypt">
+      <i class="fas fa-flag"></i>
+    </button>
+  </div>
+
+  <!-- Map Container -->
+  <div [id]="mapId" class="world-map"></div>
+</div>

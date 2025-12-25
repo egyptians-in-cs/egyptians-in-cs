@@ -11,10 +11,22 @@ import { IResearcher } from '../researchers';
 export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() researchers: IResearcher[] = [];
   @Input() mapId: string = 'map';
+  @Input() hoveredResearcher: IResearcher | null = null;
 
   private map!: L.Map;
   private markers!: L.MarkerClusterGroup;
   private initialized = false;
+  private highlightMarker: L.CircleMarker | null = null;
+  private researcherMarkerMap: Map<string, L.Marker> = new Map();
+
+  // Region zoom presets
+  regions = {
+    world: { center: [25, 20] as [number, number], zoom: 2 },
+    usa: { center: [39, -98] as [number, number], zoom: 4 },
+    europe: { center: [50, 10] as [number, number], zoom: 4 },
+    middleEast: { center: [26, 42] as [number, number], zoom: 5 },
+    egypt: { center: [27, 30] as [number, number], zoom: 6 }
+  };
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -27,6 +39,48 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.initialized && changes['researchers']) {
       this.updateMarkers();
+    }
+    if (this.initialized && changes['hoveredResearcher']) {
+      this.highlightResearcher(this.hoveredResearcher);
+    }
+  }
+
+  // Zoom to a specific region
+  zoomToRegion(region: keyof typeof this.regions): void {
+    if (this.map) {
+      const { center, zoom } = this.regions[region];
+      this.map.flyTo(center, zoom, { duration: 0.5 });
+    }
+  }
+
+  // Highlight a researcher on the map
+  private highlightResearcher(researcher: IResearcher | null): void {
+    // Remove previous highlight
+    if (this.highlightMarker) {
+      this.map.removeLayer(this.highlightMarker);
+      this.highlightMarker = null;
+    }
+
+    if (researcher && researcher.location) {
+      // Add a pulsing highlight circle
+      this.highlightMarker = L.circleMarker(
+        [researcher.location.lat, researcher.location.lng],
+        {
+          radius: 20,
+          color: '#E7C29C',
+          fillColor: '#E7C29C',
+          fillOpacity: 0.3,
+          weight: 3,
+          className: 'highlight-pulse'
+        }
+      );
+      this.highlightMarker.addTo(this.map);
+
+      // Pan to the researcher location smoothly
+      this.map.panTo([researcher.location.lat, researcher.location.lng], {
+        animate: true,
+        duration: 0.3
+      });
     }
   }
 

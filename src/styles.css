@@ -13,7 +13,8 @@
   }
 
   body {
-    @apply font-sans text-navy-900 bg-navy-50 antialiased;
+    @apply font-sans text-navy-900 bg-navy-50 antialiased
+           dark:bg-navy-950 dark:text-navy-100;
   }
 
   /* RTL Support */
@@ -53,22 +54,23 @@
   .research-card {
     @apply bg-white rounded-xl shadow-card overflow-hidden
            border border-navy-100 hover:shadow-elevated
-           transition-all duration-300;
+           transition-all duration-300
+           dark:bg-navy-800 dark:border-navy-700;
   }
 
   /* Tree Filter Items */
   .tree-item {
     @apply flex items-center gap-2 px-3 py-2 rounded-lg
            cursor-pointer transition-all duration-200
-           hover:bg-navy-100;
+           hover:bg-navy-100 dark:hover:bg-navy-700;
   }
 
   .tree-item.active {
-    @apply bg-navy-900 text-white;
+    @apply bg-navy-900 text-white dark:bg-gold-400 dark:text-navy-900;
   }
 
   .tree-item.active .badge {
-    @apply bg-white/20 text-white;
+    @apply bg-white/20 text-white dark:bg-navy-900/30 dark:text-navy-900;
   }
 
   /* Badge Styles */
@@ -78,19 +80,20 @@
   }
 
   .badge-primary {
-    @apply bg-navy-100 text-navy-800;
+    @apply bg-navy-100 text-navy-800 dark:bg-navy-700 dark:text-navy-200;
   }
 
   .badge-gold {
-    @apply bg-gold-100 text-gold-800;
+    @apply bg-gold-100 text-gold-800 dark:bg-gold-400/20 dark:text-gold-300;
   }
 
   .badge-teal {
-    @apply bg-teal-500/10 text-teal-600;
+    @apply bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400;
   }
 
   .badge-count {
-    @apply bg-navy-100 text-navy-700 text-xs px-1.5 py-0.5 rounded;
+    @apply bg-navy-100 text-navy-700 text-xs px-1.5 py-0.5 rounded
+           dark:bg-navy-700 dark:text-navy-300;
   }
 
   /* Form Elements */
@@ -98,7 +101,9 @@
     @apply w-full px-4 py-3 border-2 border-navy-200 rounded-lg
            focus:border-navy-500 focus:ring-2 focus:ring-navy-500/20
            focus:outline-none transition-colors
-           placeholder:text-navy-400;
+           placeholder:text-navy-400
+           dark:bg-navy-800 dark:border-navy-600 dark:text-white
+           dark:placeholder:text-navy-400 dark:focus:border-gold-400;
   }
 
   /* Card Header Gradient */
@@ -108,14 +113,38 @@
 
   /* Section Title */
   .section-title {
-    @apply text-lg font-semibold text-navy-900 flex items-center gap-2;
+    @apply text-lg font-semibold text-navy-900 flex items-center gap-2
+           dark:text-navy-100;
   }
 
   /* Social Link Icon */
   .social-link {
     @apply w-9 h-9 flex items-center justify-center rounded-full
            bg-navy-100 text-navy-600 hover:bg-navy-900 hover:text-white
-           transition-all duration-200;
+           transition-all duration-200
+           dark:bg-navy-700 dark:text-navy-300 dark:hover:bg-gold-400 dark:hover:text-navy-900;
+  }
+
+  /* Sidebar/Filter Panel */
+  .sidebar-panel {
+    @apply bg-white rounded-xl shadow-card border border-navy-100
+           dark:bg-navy-800 dark:border-navy-700;
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    @apply bg-navy-200 dark:bg-navy-700 animate-pulse rounded;
+  }
+
+  /* Filter Tag Chip */
+  .filter-tag {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm
+           bg-navy-100 text-navy-700
+           dark:bg-navy-700 dark:text-navy-200;
+  }
+
+  .filter-tag-remove {
+    @apply ml-1 hover:text-red-500 cursor-pointer transition-colors;
   }
 }
 
