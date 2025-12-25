@@ -425,9 +425,9 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## Created By
 
-**Badr AlKhamissi** · [Website](https://bkhmsi.github.io/) · [Twitter](https://twitter.com/baboratorium) · [LinkedIn](https://www.linkedin.com/in/bkhmsi/)
+**Badr AlKhamissi** · [Website](https://bkhmsi.github.io/) · [Twitter](https://x.com/bkhmsi) · [LinkedIn](https://www.linkedin.com/in/bkhmsi/)
 
-**Mohamed Moustafa Dawoud** · [Website](https://moamendawoud.com) · [Twitter](https://twitter.com/MoamenDawoud) · [LinkedIn](https://www.linkedin.com/in/moamen-dawoud/)
+**Mohamed Moustafa Dawoud** · [Website](https://momodawoud.github.io) · [Twitter](https://x.com/mohamedmustfaaa) · [LinkedIn](https://www.linkedin.com/in/mohamedmostafadawod/)
 
 Have questions or suggestions? Feel free to reach out or [open an issue](https://github.com/egyptians-in-cs/Egyptians-in-cs/issues).
 
