@@ -2,7 +2,7 @@
 
 A web application showcasing prominent Egyptian researchers in Computer Science and AI. Features an interactive world map, hierarchical research area filtering, and researcher profiles with academic metrics.
 
-**Live Website**: [https://bkhmsi.github.io/egyptians-in-ai/](https://bkhmsi.github.io/egyptians-in-ai/)
+**Live Website**: [https://egyptians-in-cs.github.io/Egyptians-in-cs/](https://egyptians-in-cs.github.io/Egyptians-in-cs/)
 
 ![Preview](src/assets/thumbnail.png)
 
