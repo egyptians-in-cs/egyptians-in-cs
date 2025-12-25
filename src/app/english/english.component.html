@@ -74,7 +74,7 @@
     <div class="lg:sticky lg:top-24 space-y-4">
 
       <!-- Search Box with Autocomplete -->
-      <div class="sidebar-panel p-4 search-container animate-on-scroll stagger-1">
+      <div class="sidebar-panel p-4 search-container animate-on-scroll stagger-1 relative z-40">
         <label class="block text-sm font-semibold text-navy-900 dark:text-navy-100 mb-2">
           <i class="fa fa-search text-navy-500 dark:text-navy-400 mr-2"></i>
           Search Researchers
@@ -97,7 +97,7 @@
           <div *ngIf="showAutocomplete"
                class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-navy-800
                       rounded-lg shadow-elevated border border-navy-100 dark:border-navy-700
-                      z-50 overflow-hidden">
+                      z-[100] overflow-hidden max-h-80 overflow-y-auto">
             <button
               *ngFor="let result of autocompleteResults"
               (click)="selectAutocomplete(result)"
