@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { IResearcher } from '../researchers';
 import people from '../../assets/researchers_en.json';
 import { FilterService } from '../filter.service';
+import { LocationService } from '../location.service';
+
 @Component({
   selector: 'app-arabic',
   templateUrl: './arabic.component.html',
@@ -17,12 +19,23 @@ export class ArabicComponent implements OnInit {
   searchQuery = "";
   en_active: boolean = true;
 
-  constructor(private filterService: FilterService) {
+  // Map-related
+  researchersWithLocation: IResearcher[] = [];
+  locationCount: number = 0;
+
+  constructor(private filterService: FilterService, private locationService: LocationService) {
     [this.rinterests, this.rinterestsFreq] = this.filterService.getResearchIntersts(people);
     this.sortShuffle();
    }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.loadLocations();
+  }
+
+  async loadLocations(): Promise<void> {
+    await this.locationService.loadLocations();
+    this.researchersWithLocation = this.locationService.enrichAllWithLocations(this.profiles);
+    this.locationCount = this.researchersWithLocation.filter(r => r.location).length;
   }
 
   sortAZ() {

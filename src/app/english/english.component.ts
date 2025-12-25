@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { IResearcher } from '../researchers';
+import { IResearcher, ICategoryHierarchy, ITaxonomy } from '../researchers';
 import people from '../../assets/researchers_en.json';
+import categoriesData from '../../assets/categories.json';
 import { FilterService } from '../filter.service';
+import { LocationService } from '../location.service';
 
 @Component({
   selector: 'app-english',
@@ -10,8 +12,8 @@ import { FilterService } from '../filter.service';
 })
 
 export class EnglishComponent implements OnInit {
-  
-  title = 'Egyptians in AI';
+
+  title = 'Egyptians in CS';
   researchers: IResearcher[] = people;
   rinterests: {[key: string]: boolean} = {};
   rinterestsFreq: {[key: string]: number} = {};
@@ -19,12 +21,159 @@ export class EnglishComponent implements OnInit {
   searchQuery = "";
   en_active: boolean = true;
 
-  constructor(private filterService: FilterService) {
+  // Standardized interests and categories
+  stdInterests: {[key: string]: boolean} = {};
+  stdInterestsFreq: {[key: string]: number} = {};
+  categories: ICategoryHierarchy = categoriesData.categories;
+  categoryOrder: string[] = categoriesData.categoryOrder;
+  categoryCounts: {[key: string]: number} = {};
+  selectedCategory: string = 'all';
+
+  // Hierarchical taxonomy
+  taxonomy: ITaxonomy = categoriesData.taxonomy;
+  taxonomyCounts: {[key: string]: number} = {};
+
+  // Tree state
+  expandedTracks: {[key: string]: boolean} = {};
+  expandedSubtracks: {[key: string]: boolean} = {};
+  selectedMainTrack: string = 'all';
+  selectedSubtrack: string = '';
+  selectedArea: string = '';
+
+  // Map-related
+  researchersWithLocation: IResearcher[] = [];
+  locationCount: number = 0;
+
+  constructor(private filterService: FilterService, private locationService: LocationService) {
     [this.rinterests, this.rinterestsFreq] = this.filterService.getResearchIntersts(people);
+    [this.stdInterests, this.stdInterestsFreq] = this.filterService.getStandardizedInterests(people);
+    this.categoryCounts = this.filterService.getCategoryCounts(people, this.categories);
+    this.taxonomyCounts = this.filterService.getTaxonomyCounts(people, this.taxonomy);
+
+    // Initialize all tracks as collapsed
+    for (const track of this.categoryOrder) {
+      this.expandedTracks[track] = false;
+    }
     this.sortShuffle();
    }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.loadLocations();
+  }
+
+  async loadLocations(): Promise<void> {
+    await this.locationService.loadLocations();
+    this.researchersWithLocation = this.locationService.enrichAllWithLocations(this.profiles);
+    this.locationCount = this.researchersWithLocation.filter(r => r.location).length;
+  }
+
+  // Get main tracks (Level 1)
+  getMainTracks(): string[] {
+    return this.categoryOrder;
+  }
+
+  // Get subtracks for a main track (Level 2)
+  getSubtracks(mainTrack: string): string[] {
+    if (!this.taxonomy[mainTrack]) return [];
+    return Object.keys(this.taxonomy[mainTrack]);
+  }
+
+  // Get areas for a subtrack (Level 3)
+  getAreas(mainTrack: string, subtrack: string): string[] {
+    if (!this.taxonomy[mainTrack] || !this.taxonomy[mainTrack][subtrack]) return [];
+    return this.taxonomy[mainTrack][subtrack];
+  }
+
+  // Toggle main track expansion
+  toggleTrack(track: string): void {
+    this.expandedTracks[track] = !this.expandedTracks[track];
+  }
+
+  // Toggle subtrack expansion
+  toggleSubtrack(mainTrack: string, subtrack: string): void {
+    const key = `${mainTrack}|${subtrack}`;
+    this.expandedSubtracks[key] = !this.expandedSubtracks[key];
+  }
+
+  // Check if track is expanded
+  isTrackExpanded(track: string): boolean {
+    return this.expandedTracks[track] || false;
+  }
+
+  // Check if subtrack is expanded
+  isSubtrackExpanded(mainTrack: string, subtrack: string): boolean {
+    const key = `${mainTrack}|${subtrack}`;
+    return this.expandedSubtracks[key] || false;
+  }
+
+  // Get count for any term
+  getCount(term: string): number {
+    return this.taxonomyCounts[term] || 0;
+  }
+
+  // Filter by main track
+  filterByMainTrack(track: string): void {
+    this.selectedMainTrack = track;
+    this.selectedSubtrack = '';
+    this.selectedArea = '';
+
+    if (track === 'all') {
+      this.researchers = this.filterService.sortShuffle([...this.profiles]);
+    } else {
+      this.researchers = this.filterService.filterByMainTrack(this.profiles, track, this.taxonomy);
+    }
+  }
+
+  // Filter by subtrack
+  filterBySubtrack(mainTrack: string, subtrack: string): void {
+    this.selectedMainTrack = mainTrack;
+    this.selectedSubtrack = subtrack;
+    this.selectedArea = '';
+    this.researchers = this.filterService.filterBySubtrack(this.profiles, mainTrack, subtrack, this.taxonomy);
+  }
+
+  // Filter by specific area
+  filterByArea(area: string): void {
+    this.selectedArea = area;
+    this.researchers = this.filterService.filterByArea(this.profiles, area);
+  }
+
+  // Clear all filters
+  clearFilters(): void {
+    this.selectedMainTrack = 'all';
+    this.selectedSubtrack = '';
+    this.selectedArea = '';
+    this.researchers = this.filterService.sortShuffle([...this.profiles]);
+  }
+
+  // Check if a track is selected or contains the selection
+  isTrackActive(track: string): boolean {
+    return this.selectedMainTrack === track;
+  }
+
+  // Check if a subtrack is selected
+  isSubtrackActive(mainTrack: string, subtrack: string): boolean {
+    return this.selectedMainTrack === mainTrack && this.selectedSubtrack === subtrack;
+  }
+
+  // Check if an area is selected
+  isAreaActive(area: string): boolean {
+    return this.selectedArea === area;
+  }
+
+  // Expand all tracks
+  expandAllTracks(): void {
+    for (const track of this.categoryOrder) {
+      this.expandedTracks[track] = true;
+    }
+  }
+
+  // Collapse all tracks
+  collapseAllTracks(): void {
+    for (const track of this.categoryOrder) {
+      this.expandedTracks[track] = false;
+    }
+    this.expandedSubtracks = {};
   }
 
   sortAZ() {
@@ -65,6 +214,48 @@ export class EnglishComponent implements OnInit {
       this.rinterests[key] = false;
     }
     this.researchers = this.profiles;
+  }
+
+  // New: Filter by category
+  filterByCategory() {
+    if (this.selectedCategory === 'all') {
+      this.researchers = this.filterService.sortShuffle([...this.profiles]);
+    } else {
+      this.researchers = this.filterService.filterByCategory(this.profiles, this.selectedCategory, this.categories);
+    }
+  }
+
+  // New: Filter by standardized interests
+  filterStdInterests() {
+    this.researchers = this.filterService.filterByStandardizedInterests(this.profiles, this.stdInterests);
+  }
+
+  // New: Check all standardized interests
+  checkAllStdInterests() {
+    for (let key in this.stdInterests) {
+      this.stdInterests[key] = true;
+    }
+    this.researchers = this.profiles;
+  }
+
+  // New: Clear all standardized interests
+  clearAllStdInterests() {
+    for (let key in this.stdInterests) {
+      this.stdInterests[key] = false;
+    }
+    this.researchers = this.profiles;
+  }
+
+  // New: Get interests for a category
+  getInterestsForCategory(category: string): string[] {
+    return this.categories[category] || [];
+  }
+
+  // New: Get sorted standardized interests (by frequency)
+  getSortedStdInterests(): string[] {
+    return Object.keys(this.stdInterestsFreq).sort((a, b) => {
+      return this.stdInterestsFreq[b] - this.stdInterestsFreq[a];
+    });
   }
 
   editProfile(researcher:IResearcher) {

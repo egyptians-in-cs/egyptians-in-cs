@@ -1,0 +1,139 @@
+import { Component, AfterViewInit, Input, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import * as L from 'leaflet';
+import 'leaflet.markercluster';
+import { IResearcher } from '../researchers';
+
+@Component({
+  selector: 'app-map',
+  templateUrl: './map.component.html',
+  styleUrls: ['./map.component.css']
+})
+export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
+  @Input() researchers: IResearcher[] = [];
+  @Input() mapId: string = 'map';
+
+  private map!: L.Map;
+  private markers!: L.MarkerClusterGroup;
+  private initialized = false;
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.initMap();
+      this.addMarkers();
+      this.initialized = true;
+    }, 100);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.initialized && changes['researchers']) {
+      this.updateMarkers();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+    }
+  }
+
+  private initMap(): void {
+    // Fix for default marker icons in Angular
+    const iconRetinaUrl = 'assets/marker-icon-2x.png';
+    const iconUrl = 'assets/marker-icon.png';
+    const shadowUrl = 'assets/marker-shadow.png';
+
+    const iconDefault = L.icon({
+      iconRetinaUrl,
+      iconUrl,
+      shadowUrl,
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      tooltipAnchor: [16, -28],
+      shadowSize: [41, 41]
+    });
+
+    L.Marker.prototype.options.icon = iconDefault;
+
+    this.map = L.map(this.mapId, {
+      center: [25, 20],
+      zoom: 2,
+      minZoom: 2,
+      maxBounds: [[-90, -180], [90, 180]],
+      maxBoundsViscosity: 1.0
+    });
+
+    // CartoDB Voyager tiles - clean, academic look
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(this.map);
+  }
+
+  private addMarkers(): void {
+    this.markers = (L as any).markerClusterGroup({
+      chunkedLoading: true,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      maxClusterRadius: 50,
+      iconCreateFunction: (cluster: any) => {
+        const count = cluster.getChildCount();
+        let size = 'small';
+        if (count > 10) size = 'medium';
+        if (count > 25) size = 'large';
+
+        return L.divIcon({
+          html: `<div><span>${count}</span></div>`,
+          className: `marker-cluster marker-cluster-${size}`,
+          iconSize: L.point(40, 40)
+        });
+      }
+    });
+
+    this.researchers.forEach(researcher => {
+      if (researcher.location) {
+        const marker = L.marker([researcher.location.lat, researcher.location.lng]);
+        marker.bindPopup(this.createPopup(researcher), {
+          maxWidth: 250,
+          className: 'researcher-popup-container'
+        });
+        this.markers.addLayer(marker);
+      }
+    });
+
+    this.map.addLayer(this.markers);
+  }
+
+  private updateMarkers(): void {
+    if (this.markers) {
+      this.markers.clearLayers();
+      this.researchers.forEach(researcher => {
+        if (researcher.location) {
+          const marker = L.marker([researcher.location.lat, researcher.location.lng]);
+          marker.bindPopup(this.createPopup(researcher), {
+            maxWidth: 250,
+            className: 'researcher-popup-container'
+          });
+          this.markers.addLayer(marker);
+        }
+      });
+    }
+  }
+
+  private createPopup(researcher: IResearcher): string {
+    return `
+      <div class="researcher-popup">
+        <img src="${researcher.photo}" alt="${researcher.name}" onerror="this.src='assets/default-avatar.png'" />
+        <h4>${researcher.name}</h4>
+        <p class="affiliation">${researcher.affiliation}</p>
+        ${researcher.location ? `<p class="location"><i class="fas fa-map-marker-alt"></i> ${researcher.location.city}, ${researcher.location.country}</p>` : ''}
+        <a href="#${researcher.name}" class="view-profile">View Profile</a>
+      </div>
+    `;
+  }
+
+  getLocationCount(): number {
+    return this.researchers.filter(r => r.location).length;
+  }
+}

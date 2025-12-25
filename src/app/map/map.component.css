@@ -1,0 +1,140 @@
+:host {
+  display: block;
+}
+
+.world-map {
+  height: 400px;
+  width: 100%;
+  z-index: 0;
+  background: #f0f4f8;
+}
+
+/* Custom cluster styling - Navy/Gold academic theme */
+:host ::ng-deep .marker-cluster {
+  background: rgba(9, 27, 43, 0.6);
+  border-radius: 50%;
+}
+
+:host ::ng-deep .marker-cluster div {
+  background: #091B2B;
+  color: #E7C29C;
+  font-weight: 600;
+  width: 32px;
+  height: 32px;
+  margin: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+:host ::ng-deep .marker-cluster-small {
+  background: rgba(9, 27, 43, 0.5);
+}
+
+:host ::ng-deep .marker-cluster-small div {
+  background: #091B2B;
+  width: 28px;
+  height: 28px;
+  margin: 6px;
+  font-size: 11px;
+}
+
+:host ::ng-deep .marker-cluster-medium {
+  background: rgba(9, 27, 43, 0.6);
+}
+
+:host ::ng-deep .marker-cluster-medium div {
+  width: 32px;
+  height: 32px;
+  margin: 4px;
+  font-size: 12px;
+}
+
+:host ::ng-deep .marker-cluster-large {
+  background: rgba(231, 194, 156, 0.6);
+}
+
+:host ::ng-deep .marker-cluster-large div {
+  background: #E7C29C;
+  color: #091B2B;
+  width: 36px;
+  height: 36px;
+  margin: 2px;
+  font-size: 14px;
+}
+
+/* Popup styling */
+:host ::ng-deep .researcher-popup-container .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(9, 27, 43, 0.15);
+  border: 1px solid #e2e8f0;
+}
+
+:host ::ng-deep .researcher-popup-container .leaflet-popup-tip {
+  background: white;
+}
+
+:host ::ng-deep .researcher-popup {
+  text-align: center;
+  min-width: 180px;
+  padding: 8px;
+}
+
+:host ::ng-deep .researcher-popup img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #E7C29C;
+  margin-bottom: 8px;
+  object-fit: cover;
+}
+
+:host ::ng-deep .researcher-popup h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #091B2B;
+}
+
+:host ::ng-deep .researcher-popup .affiliation {
+  margin: 4px 0;
+  font-size: 12px;
+  color: #627d98;
+  line-height: 1.3;
+}
+
+:host ::ng-deep .researcher-popup .location {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  color: #1C8394;
+}
+
+:host ::ng-deep .researcher-popup .location i {
+  margin-right: 4px;
+}
+
+:host ::ng-deep .researcher-popup .view-profile {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 16px;
+  background: #091B2B;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+:host ::ng-deep .researcher-popup .view-profile:hover {
+  background: #102a43;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .world-map {
+    height: 300px;
+  }
+}

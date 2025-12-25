@@ -1,1 +1,160 @@
-/* You can add global styles to this file, and also import other style files */
+/* Google Fonts - must come before Tailwind */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Layer Customizations */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans text-navy-900 bg-navy-50 antialiased;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    @apply font-arabic;
+  }
+}
+
+/* Component Layer - Reusable Classes */
+@layer components {
+  /* Academic Button Styles */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5
+           bg-navy-900 text-white font-medium rounded-lg
+           hover:bg-navy-800 focus:outline-none focus:ring-2
+           focus:ring-navy-500 focus:ring-offset-2
+           transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-5 py-2.5
+           bg-gold-400 text-navy-900 font-medium rounded-lg
+           hover:bg-gold-500 focus:outline-none focus:ring-2
+           focus:ring-gold-400 focus:ring-offset-2
+           transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-5 py-2.5
+           border-2 border-navy-300 text-navy-700 font-medium rounded-lg
+           hover:bg-navy-900 hover:text-white hover:border-navy-900
+           focus:outline-none focus:ring-2 focus:ring-navy-500 focus:ring-offset-2
+           transition-all duration-200;
+  }
+
+  /* Research Card */
+  .research-card {
+    @apply bg-white rounded-xl shadow-card overflow-hidden
+           border border-navy-100 hover:shadow-elevated
+           transition-all duration-300;
+  }
+
+  /* Tree Filter Items */
+  .tree-item {
+    @apply flex items-center gap-2 px-3 py-2 rounded-lg
+           cursor-pointer transition-all duration-200
+           hover:bg-navy-100;
+  }
+
+  .tree-item.active {
+    @apply bg-navy-900 text-white;
+  }
+
+  .tree-item.active .badge {
+    @apply bg-white/20 text-white;
+  }
+
+  /* Badge Styles */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full
+           text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-navy-100 text-navy-800;
+  }
+
+  .badge-gold {
+    @apply bg-gold-100 text-gold-800;
+  }
+
+  .badge-teal {
+    @apply bg-teal-500/10 text-teal-600;
+  }
+
+  .badge-count {
+    @apply bg-navy-100 text-navy-700 text-xs px-1.5 py-0.5 rounded;
+  }
+
+  /* Form Elements */
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-navy-200 rounded-lg
+           focus:border-navy-500 focus:ring-2 focus:ring-navy-500/20
+           focus:outline-none transition-colors
+           placeholder:text-navy-400;
+  }
+
+  /* Card Header Gradient */
+  .card-header-gradient {
+    @apply bg-gradient-to-br from-navy-800 to-navy-900;
+  }
+
+  /* Section Title */
+  .section-title {
+    @apply text-lg font-semibold text-navy-900 flex items-center gap-2;
+  }
+
+  /* Social Link Icon */
+  .social-link {
+    @apply w-9 h-9 flex items-center justify-center rounded-full
+           bg-navy-100 text-navy-600 hover:bg-navy-900 hover:text-white
+           transition-all duration-200;
+  }
+}
+
+/* Utility Layer */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom academic scrollbar */
+  .scrollbar-academic {
+    scrollbar-width: thin;
+    scrollbar-color: #bcccdc #f0f4f8;
+  }
+
+  .scrollbar-academic::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-academic::-webkit-scrollbar-track {
+    @apply bg-navy-50 rounded;
+  }
+
+  .scrollbar-academic::-webkit-scrollbar-thumb {
+    @apply bg-navy-200 rounded hover:bg-navy-300;
+  }
+
+  /* Anchor offset for sticky header */
+  .scroll-offset {
+    scroll-margin-top: 6rem;
+  }
+}

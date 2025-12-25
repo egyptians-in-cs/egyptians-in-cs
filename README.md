@@ -1,60 +1,430 @@
-# Egyptians in AI Research
+# Egyptians in Computer Science
 
-Website: https://bkhmsi.github.io/egyptians-in-ai/
+A web application showcasing prominent Egyptian researchers in Computer Science and AI. Features an interactive world map, hierarchical research area filtering, and researcher profiles with academic metrics.
 
-Welcome to Egyptian in AI, a website dedicated to showcasing the profiles of prominent Egyptian researchers in the field of artificial intelligence. 
+**Live Website**: [https://bkhmsi.github.io/egyptians-in-ai/](https://bkhmsi.github.io/egyptians-in-ai/)
 
-If you think that someone is missing from our list of featured researchers, we welcome contributions from the community. To be considered for inclusion, the only criteria is that the individual must have an h-index of 5 or higher, as recorded on their Google Scholar profile. You can submit your suggestion by filling out [this form](https://docs.google.com/forms/d/e/1FAIpQLSdLaYBQyOzI5gnlGzwOki3b1TJtFjLUeHUKxkGtXQDhHdSreg/viewform?usp=sf_link), or request updates for existing profiles.
+![Preview](src/assets/thumbnail.png)
 
-We hope that you find our website informative and inspiring, and we invite you to explore the profiles of our featured researchers to learn more about their work.
+## Features
 
-## Other `X in Y` Websites:
+- **Interactive World Map**: Visualize where Egyptian researchers are located globally using Leaflet.js with marker clustering
+- **Hierarchical Research Areas**: Browse 16 main tracks, 87 subtracks, and 594 research areas
+- **Researcher Profiles**: Display researcher information including h-index, citations, affiliations, and social links
+- **Bilingual Support**: Full English and Arabic (RTL) interfaces
+- **Advanced Filtering**: Filter by name, research area, or sort by h-index/citations
+- **Responsive Design**: Mobile-first design using Tailwind CSS
+
+## Tech Stack
+
+- **Frontend**: Angular 14
+- **Styling**: Tailwind CSS 3.4
+- **Maps**: Leaflet.js with MarkerCluster
+- **Icons**: Font Awesome 6
+- **Fonts**: Inter, Merriweather, Noto Sans Arabic
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 16+
+- npm 8+
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/egyptians-in-ai.git
+cd egyptians-in-ai
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+Visit `http://localhost:4200` in your browser.
+
+### Build for Production
+
+```bash
+# Build for production
+npm run build
+
+# Build for GitHub Pages (outputs to /docs folder)
+ng build --configuration production --output-path docs --base-href /egyptians-in-ai/
+```
+
+---
+
+## Project Structure
+
+```
+egyptians-in-ai/
+├── src/
+│   ├── app/
+│   │   ├── arabic/              # Arabic (RTL) component
+│   │   ├── english/             # English component
+│   │   ├── map/                 # Interactive world map component
+│   │   ├── app.component.*      # Root component (navbar, footer)
+│   │   ├── filter.service.ts    # Filtering and sorting logic
+│   │   ├── location.service.ts  # Location enrichment for map
+│   │   └── researchers.ts       # TypeScript interfaces
+│   ├── assets/
+│   │   ├── researchers_en.json  # Researcher data (English)
+│   │   ├── researchers_ar.json  # Researcher data (Arabic)
+│   │   ├── categories.json      # Research areas taxonomy
+│   │   ├── locations.json       # Affiliation to coordinates mapping
+│   │   └── images/              # Researcher photos
+│   └── styles.css               # Global Tailwind styles
+├── tailwind.config.js           # Tailwind configuration
+├── angular.json                 # Angular configuration
+└── package.json
+```
+
+---
+
+## How to Add New Researchers
+
+### Step 1: Add Researcher Data
+
+Edit `src/assets/researchers_en.json` and add a new entry:
+
+```json
+{
+  "name": "Ahmed Mohamed",
+  "affiliation": "Cairo University",
+  "position": "Associate Professor",
+  "hindex": 25,
+  "citedby": 3500,
+  "photo": "./assets/images/ahmed_mohamed.jpg",
+  "scholar": "https://scholar.google.com/citations?user=XXXX",
+  "linkedin": "https://linkedin.com/in/ahmedmohamed",
+  "website": "https://ahmedmohamed.com",
+  "twitter": "https://twitter.com/ahmedmohamed",
+  "interests": ["Machine Learning", "Computer Vision", "Deep Learning"],
+  "standardized_interests": ["Machine Learning", "Computer Vision", "Deep Learning"],
+  "lastupdate": "2024-01-15"
+}
+```
+
+### Step 2: Add Photo
+
+Place the researcher's photo in `src/assets/images/` with the filename matching the `photo` field.
+
+### Step 3: Update Location Mapping (Optional)
+
+If the affiliation isn't already in `src/assets/locations.json`, add it:
+
+```json
+{
+  "Cairo University": {
+    "lat": 30.0131,
+    "lng": 31.2089,
+    "country": "Egypt",
+    "city": "Cairo"
+  }
+}
+```
+
+### Inclusion Criteria
+
+To be listed, a researcher must have an **h-index of 5 or higher** on Google Scholar.
+
+---
+
+## How to Customize Research Areas
+
+The research taxonomy is defined in `src/assets/categories.json` with three levels:
+
+### Structure
+
+```json
+{
+  "taxonomy": {
+    "Main Track": {
+      "Subtrack": ["Area 1", "Area 2", "Area 3"]
+    }
+  },
+  "categories": {
+    "Main Track": ["All areas flattened for filtering"]
+  },
+  "categoryOrder": ["Main Track 1", "Main Track 2"]
+}
+```
+
+### Current Taxonomy (16 Main Tracks)
+
+| Track | Subtracks | Areas |
+|-------|-----------|-------|
+| Artificial Intelligence | 6 | 65 |
+| Natural Language Processing | 7 | 54 |
+| Computer Vision | 7 | 58 |
+| Multimodal AI | 3 | 17 |
+| Robotics & Autonomous Systems | 5 | 32 |
+| Data Science & Analytics | 5 | 32 |
+| Data Management | 5 | 33 |
+| Computer Systems & Architecture | 5 | 32 |
+| Computer Networks & Communications | 5 | 33 |
+| Software Engineering | 5 | 34 |
+| Programming Languages | 5 | 29 |
+| Theory of Computation | 6 | 35 |
+| Security & Cryptography | 6 | 37 |
+| Human-Computer Interaction | 5 | 29 |
+| Graphics & Visualization | 5 | 31 |
+| Applied Computing | 7 | 43 |
+
+**Total: 16 tracks, 87 subtracks, 594 research areas**
+
+### Adding a New Research Area
+
+1. Add to the `taxonomy` under the appropriate track and subtrack
+2. Add to the `categories` flat list for that track
+3. Update researcher `standardized_interests` to use the new area
+
+### Adding a New Main Track
+
+1. Add the track to `taxonomy` with its subtracks and areas
+2. Add to `categories` with flattened list of all areas
+3. Add to `categoryOrder` array for display order
+
+---
+
+## Customizing for Your Own Use Case
+
+### Fork for Your Community
+
+This project can be adapted for any community (e.g., "Moroccans in AI", "Pakistanis in CS"):
+
+1. Fork this repository
+2. Replace data in `src/assets/researchers_en.json`
+3. Update `src/assets/categories.json` for your research focus
+4. Update `src/assets/locations.json` with relevant institutions
+5. Modify branding in `src/app/app.component.html`
+6. Update form links to your own Google Form
+
+### Change the Theme
+
+Edit `tailwind.config.js` to customize colors:
+
+```javascript
+colors: {
+  'navy': {
+    900: '#091B2B',  // Primary dark
+    // ... other shades
+  },
+  'gold': {
+    400: '#E7C29C',  // Accent color
+  },
+  'teal': {
+    500: '#1C8394',  // Secondary accent
+  }
+}
+```
+
+### Change Fonts
+
+Update `src/styles.css`:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=YOUR_FONT&display=swap');
+```
+
+And `tailwind.config.js`:
+
+```javascript
+fontFamily: {
+  'sans': ['Your Font', 'system-ui', 'sans-serif'],
+}
+```
+
+### Modify Map Settings
+
+Edit `src/app/map/map.component.ts`:
+
+```typescript
+// Change initial view
+this.map = L.map(this.mapId, {
+  center: [25, 20],  // Latitude, Longitude
+  zoom: 2,           // Initial zoom level
+});
+
+// Change tile provider
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(this.map);
+```
+
+---
+
+## Deployment to GitHub Pages
+
+### Option 1: Manual Deployment
+
+1. Build the project:
+```bash
+ng build --configuration production --output-path docs --base-href /your-repo-name/
+```
+
+2. Commit and push:
+```bash
+git add .
+git commit -m "Deploy to GitHub Pages"
+git push origin main
+```
+
+3. Configure GitHub Pages:
+   - Go to repository Settings → Pages
+   - Set Source to "Deploy from a branch"
+   - Select `main` branch and `/docs` folder
+   - Save
+
+### Option 2: Using GitHub Actions
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build -- --configuration production --base-href /egyptians-in-ai/
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/egyptians-in-ai
+```
+
+---
+
+## Updating Researcher Data
+
+### Manual Update
+
+1. Edit `src/assets/researchers_en.json` directly
+2. Rebuild and deploy
+
+### Bulk Update (Using Scripts)
+
+1. Download new entries spreadsheet as `researchers.csv`
+2. Run `python scripts/populate.py` to generate `researchers_new.json`
+3. Append valid entries to `researchers_en.json`
+4. Run `python scripts/google_scholar.py` to update h-index values
+5. Rebuild and deploy
+
+---
+
+## Data Files Reference
+
+### researchers_en.json / researchers_ar.json
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Full name |
+| `affiliation` | string | Yes | Current institution |
+| `position` | string | Yes | Academic title |
+| `hindex` | number | Yes | Google Scholar h-index |
+| `citedby` | number | Yes | Total citations |
+| `photo` | string | Yes | Path to photo |
+| `scholar` | string | No | Google Scholar URL |
+| `linkedin` | string | No | LinkedIn URL |
+| `website` | string | No | Personal website URL |
+| `twitter` | string | No | Twitter/X URL |
+| `interests` | string[] | Yes | Original research interests |
+| `standardized_interests` | string[] | Yes | Mapped to taxonomy |
+| `lastupdate` | string | Yes | Last update date (YYYY-MM-DD) |
+
+### locations.json
+
+Maps institution names to coordinates for the world map:
+
+```json
+{
+  "Institution Name": {
+    "lat": 30.0131,
+    "lng": 31.2089,
+    "country": "Egypt",
+    "city": "Cairo"
+  }
+}
+```
+
+### categories.json
+
+Hierarchical research taxonomy:
+- `taxonomy`: 3-level hierarchy (Track → Subtrack → Area)
+- `categories`: Flat lists per track for filtering
+- `categoryOrder`: Display order of main tracks
+
+---
+
+## Other "X in Y" Websites
+
 - [Moroccans in AI Research](https://mair.ma)
 - [Pakistanis in AI Research](https://ahmadmustafaanis.github.io/Pakistanis-in-ai/)
 
-## Steps to Create Your Own `X in Y` Website
+---
 
-1. Fork this repository: 
-Click the "Fork" button at the top right of this repository's page to create your own copy.
-2. Replace data in `./src/assets/researchers_en.json`:
-Navigate to the `./src/assets` directory and locate the `researchers_en.json` file. Replace the existing data with profiles you want to feature, following the same JSON structure.
-3. Replace all metadata and details specific to this website:
-In various places (like navigation bar, metadata, and the Google Form link), update all instances of website-specific information to your own. Make sure to modify links, headers, and other details according to your website's needs.
-4. Run your website locally using `ng serve`:
-Open a terminal, navigate to your project's root directory, and run `ng serve`. This will start a local development server, and you can access your website by opening your browser and going to `http://localhost:4200`.
-5. Build the website:
-After verifying everything works locally, build your website using the following command in your terminal:
-    ```bash
-    ng build --configuration production --base-href {{website_url}}
-    ```
-    Replace `{{website_url}}` with the actual URL where your website will be hosted, such as `https://bkhmsi.github.io/egyptians-in-ai/`.
+## Contributing
 
-6. Copy the built files:
-Locate the `dist` folder in your project's directory. Inside `dist`, you'll find a folder named after your website (e.g., egyptians-in-ai). Copy this folder and move it to the root directory of your forked repository. Rename the copied folder to `docs`.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-7. Configure GitHub Pages:
-- Open your forked repository on GitHub.
-- Go to the "Settings" tab.
-- Scroll down to the "GitHub Pages" section.
-- Under "Source," choose the docs folder from the dropdown.
-- Save the changes.
-You can reference this [GitHub article](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site) for more details.
-8. Reach out to me:
-Reach out with the link to your deployed website so I can include it in the list of `X in Y` websites.
+### Nominating a Researcher
 
-Remember, if you encounter any issues during the process, don't hesitate to ask for help!
+Submit nominations via [this form](https://docs.google.com/forms/d/e/1FAIpQLSdLaYBQyOzI5gnlGzwOki3b1TJtFjLUeHUKxkGtXQDhHdSreg/viewform).
 
+---
 
-## Update Website 
+## Troubleshooting
 
-1. Download the spreadsheet with new entries as `researchers.csv`
-2. Run `scripts/populate.py`, this will create two spreadsheets `researchers_new.json` and `researchers_update.json`
-3. Append valid entries in `researchers_new.json` to `researchers_en.json`
-4. Run `scripts/google_scholar.py` to update h-index values that will create a new file `researchers_en_new.json`
-5. Update entries in `researchers_en_new.json` with valid entries in `researchers_update.json`
-6. Rename `researchers_en_new.json` with `researchers_en.json`
+### Build Issues
 
-## Pre-Build
-```
+If you encounter OpenSSL errors with older Node.js:
+```bash
 export NODE_OPTIONS=--openssl-legacy-provider
+npm run build
 ```
+
+### Map Not Loading
+
+Ensure Leaflet CSS is included in `angular.json`:
+```json
+"styles": [
+  "src/styles.css",
+  "node_modules/leaflet/dist/leaflet.css",
+  "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
+  "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"
+]
+```
+
+---
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+## Acknowledgments
+
+- Original concept by [Badr AlKhamissi](https://medium.com/@bkhmsi/egyptians-in-ai-research-1ff64c78cc5b)
+- Research data sourced from Google Scholar
+- Map tiles by [CartoDB](https://carto.com/) and [OpenStreetMap](https://www.openstreetmap.org/)

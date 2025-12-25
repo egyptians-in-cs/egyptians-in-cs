@@ -10,7 +10,9 @@ import { ActivatedRoute, Router, RoutesRecognized  } from '@angular/router';
 export class AppComponent implements OnInit {
   title = 'Egyptians in AI';
   en_active: boolean = true;
-  
+  mobileMenuOpen: boolean = false;
+  dropdownOpen: boolean = false;
+
   constructor(private route: ActivatedRoute, private router: Router) {
 
   }
@@ -29,6 +31,14 @@ export class AppComponent implements OnInit {
       this.en_active = false;
     else
       this.en_active = true;
+    this.mobileMenuOpen = false;
   }
 
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
 }
