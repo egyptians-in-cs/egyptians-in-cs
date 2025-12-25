@@ -423,8 +423,17 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
+## Created By
+
+**Badr AlKhamissi** · [Website](https://bkhmsi.github.io/) · [Twitter](https://twitter.com/baboratorium) · [LinkedIn](https://www.linkedin.com/in/bkhmsi/)
+
+**Mohamed Moustafa Dawoud** · [Website](https://moamendawoud.com) · [Twitter](https://twitter.com/MoamenDawoud) · [LinkedIn](https://www.linkedin.com/in/moamen-dawoud/)
+
+Have questions or suggestions? Feel free to reach out or [open an issue](https://github.com/egyptians-in-cs/Egyptians-in-cs/issues).
+
+---
+
 ## Acknowledgments
 
-- Original concept by [Badr AlKhamissi](https://medium.com/@bkhmsi/egyptians-in-ai-research-1ff64c78cc5b)
 - Research data sourced from Google Scholar
 - Map tiles by [CartoDB](https://carto.com/) and [OpenStreetMap](https://www.openstreetmap.org/)
