@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { IResearcher, ICategoryHierarchy, ITaxonomy } from '../researchers';
 import people from '../../assets/researchers_en.json';
 import categoriesData from '../../assets/categories.json';
@@ -11,7 +11,9 @@ import { LocationService } from '../location.service';
   styleUrls: ['./english.component.css'],
 })
 
-export class EnglishComponent implements OnInit {
+export class EnglishComponent implements OnInit, AfterViewInit {
+
+  private scrollObserver!: IntersectionObserver;
 
   title = 'Egyptians in CS';
   researchers: IResearcher[] = people;
@@ -48,11 +50,21 @@ export class EnglishComponent implements OnInit {
   selectedSubtrack: string = '';
   selectedArea: string = '';
 
+  // Multi-select areas
+  selectedAreas: Set<string> = new Set();
+  areaSearchQuery: string = '';
+  allAreasFlat: {area: string, track: string, subtrack: string, count: number}[] = [];
+
   // Map-related
   researchersWithLocation: IResearcher[] = [];
   locationCount: number = 0;
 
-  constructor(private filterService: FilterService, private locationService: LocationService) {
+  constructor(
+    private filterService: FilterService,
+    private locationService: LocationService,
+    private cdr: ChangeDetectorRef
+  ) {
+    console.log('EnglishComponent constructor: people.length =', people.length);
     [this.rinterests, this.rinterestsFreq] = this.filterService.getResearchIntersts(people);
     [this.stdInterests, this.stdInterestsFreq] = this.filterService.getStandardizedInterests(people);
     this.categoryCounts = this.filterService.getCategoryCounts(people, this.categories);
@@ -62,15 +74,65 @@ export class EnglishComponent implements OnInit {
     for (const track of this.categoryOrder) {
       this.expandedTracks[track] = false;
     }
+
+    // Build flat list of all areas for search
+    this.buildFlatAreasList();
+
     this.sortShuffle();
    }
+
+  // Build flat list of all areas for easier searching
+  private buildFlatAreasList(): void {
+    this.allAreasFlat = [];
+    for (const track of this.categoryOrder) {
+      if (this.taxonomy[track]) {
+        for (const subtrack of Object.keys(this.taxonomy[track])) {
+          for (const area of this.taxonomy[track][subtrack]) {
+            const count = this.taxonomyCounts[area] || 0;
+            if (count > 0) {
+              this.allAreasFlat.push({ area, track, subtrack, count });
+            }
+          }
+        }
+      }
+    }
+    // Sort by count (most researchers first)
+    this.allAreasFlat.sort((a, b) => b.count - a.count);
+  }
 
   async ngOnInit(): Promise<void> {
     await this.loadLocations();
     // Simulate loading for skeleton effect
     setTimeout(() => {
       this.isLoading = false;
+      // Initialize scroll animations after content loads
+      setTimeout(() => this.initScrollAnimations(), 100);
     }, 500);
+  }
+
+  ngAfterViewInit(): void {
+    // Set up the Intersection Observer for scroll animations
+    this.scrollObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      }
+    );
+  }
+
+  private initScrollAnimations(): void {
+    // Observe all elements with scroll animation classes
+    const animatedElements = document.querySelectorAll('.animate-on-scroll, .animate-on-scroll-left, .animate-on-scroll-right');
+    animatedElements.forEach(el => {
+      this.scrollObserver.observe(el);
+    });
   }
 
   // Get initials for photo fallback
@@ -280,10 +342,17 @@ export class EnglishComponent implements OnInit {
 
   // Clear all filters
   clearFilters(): void {
+    console.log('=== clearFilters called ===');
     this.selectedMainTrack = 'all';
     this.selectedSubtrack = '';
     this.selectedArea = '';
-    this.researchers = this.filterService.sortShuffle([...this.profiles]);
+    this.selectedAreas = new Set();
+    this.areaSearchQuery = '';
+    this.researchers = people.slice();
+    console.log('clearFilters - researchers count:', this.researchers.length);
+    this.cdr.detectChanges();
+    // Re-initialize scroll animations for new cards
+    setTimeout(() => this.initScrollAnimations(), 50);
   }
 
   // Check if a track is selected or contains the selection
@@ -396,6 +465,118 @@ export class EnglishComponent implements OnInit {
     return Object.keys(this.stdInterestsFreq).sort((a, b) => {
       return this.stdInterestsFreq[b] - this.stdInterestsFreq[a];
     });
+  }
+
+  // Multi-select area methods
+  getFilteredAreas(): {area: string, track: string, subtrack: string, count: number}[] {
+    if (!this.areaSearchQuery.trim()) {
+      return this.allAreasFlat;
+    }
+    const query = this.areaSearchQuery.toLowerCase().trim();
+    return this.allAreasFlat.filter(item =>
+      item.area.toLowerCase().includes(query) ||
+      item.track.toLowerCase().includes(query) ||
+      item.subtrack.toLowerCase().includes(query)
+    );
+  }
+
+  toggleAreaSelection(area: string): void {
+    console.log('=== toggleAreaSelection called ===');
+    console.log('Area:', area);
+    console.log('Current selectedAreas:', Array.from(this.selectedAreas));
+
+    const newSet = new Set(this.selectedAreas);
+    if (newSet.has(area)) {
+      newSet.delete(area);
+      console.log('Removed area');
+    } else {
+      newSet.add(area);
+      console.log('Added area');
+    }
+    this.selectedAreas = newSet;
+    console.log('New selectedAreas:', Array.from(this.selectedAreas));
+
+    // Clear old single-select filters
+    this.selectedMainTrack = 'all';
+    this.selectedSubtrack = '';
+    this.selectedArea = '';
+    this.searchQuery = '';
+
+    this.applyMultiAreaFilter();
+    this.updateActiveFilters();
+  }
+
+  isAreaSelected(area: string): boolean {
+    return this.selectedAreas.has(area);
+  }
+
+  applyMultiAreaFilter(): void {
+    console.log('=== applyMultiAreaFilter called ===');
+    console.log('selectedAreas.size:', this.selectedAreas.size);
+    console.log('people.length:', people.length);
+
+    if (this.selectedAreas.size === 0) {
+      // Return all researchers when nothing selected
+      this.researchers = people.slice();
+      console.log('No selection - showing all:', this.researchers.length);
+      this.cdr.detectChanges();
+      // Re-initialize scroll animations for new cards
+      setTimeout(() => this.initScrollAnimations(), 50);
+      return;
+    }
+
+    // Filter researchers who have ANY of the selected areas
+    const selectedAreasArray = Array.from(this.selectedAreas);
+    console.log('Filtering by:', selectedAreasArray);
+
+    const filtered = people.filter(researcher => {
+      const interests = researcher.standardized_interests || [];
+      return interests.some(interest => selectedAreasArray.includes(interest));
+    });
+
+    this.researchers = filtered.slice();
+    console.log('Filtered count:', this.researchers.length);
+    this.cdr.detectChanges();
+    // Re-initialize scroll animations for new cards
+    setTimeout(() => this.initScrollAnimations(), 50);
+  }
+
+  clearAreaSelection(): void {
+    console.log('=== clearAreaSelection called ===');
+    console.log('people.length:', people.length);
+
+    this.selectedAreas = new Set();
+    this.areaSearchQuery = '';
+    this.selectedMainTrack = 'all';
+    this.selectedSubtrack = '';
+    this.selectedArea = '';
+
+    // Simply use the original people array directly
+    this.researchers = people.slice();
+
+    console.log('After assignment - this.researchers.length:', this.researchers.length);
+    console.log('First researcher:', this.researchers[0]?.name);
+    console.log('isLoading:', this.isLoading);
+    console.log('compactView:', this.compactView);
+
+    this.updateActiveFilters();
+    this.cdr.detectChanges();
+
+    // Re-initialize scroll animations for new cards
+    setTimeout(() => this.initScrollAnimations(), 50);
+  }
+
+  getSelectedAreasArray(): string[] {
+    return Array.from(this.selectedAreas);
+  }
+
+  removeSelectedArea(area: string): void {
+    // Create a new Set to ensure Angular change detection
+    const newSet = new Set(this.selectedAreas);
+    newSet.delete(area);
+    this.selectedAreas = newSet;
+    this.applyMultiAreaFilter();
+    this.updateActiveFilters();
   }
 
   editProfile(researcher:IResearcher) {

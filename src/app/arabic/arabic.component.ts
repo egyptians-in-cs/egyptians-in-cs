@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { IResearcher } from '../researchers';
 import people from '../../assets/researchers_en.json';
 import { FilterService } from '../filter.service';
@@ -9,7 +9,9 @@ import { LocationService } from '../location.service';
   templateUrl: './arabic.component.html',
   styleUrls: ['./arabic.component.css']
 })
-export class ArabicComponent implements OnInit {
+export class ArabicComponent implements OnInit, AfterViewInit {
+
+  private scrollObserver!: IntersectionObserver;
 
   title = 'المصريين  في الذكاء الاصطناعي';
   researchers: IResearcher[] = people;
@@ -18,6 +20,9 @@ export class ArabicComponent implements OnInit {
   profiles = this.researchers;
   searchQuery = "";
   en_active: boolean = true;
+
+  // Interest filter
+  interestSearchQuery: string = '';
 
   // Map-related
   researchersWithLocation: IResearcher[] = [];
@@ -30,6 +35,33 @@ export class ArabicComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.loadLocations();
+    // Initialize scroll animations after content loads
+    setTimeout(() => this.initScrollAnimations(), 100);
+  }
+
+  ngAfterViewInit(): void {
+    // Set up the Intersection Observer for scroll animations
+    this.scrollObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      }
+    );
+  }
+
+  private initScrollAnimations(): void {
+    // Observe all elements with scroll animation classes
+    const animatedElements = document.querySelectorAll('.animate-on-scroll, .animate-on-scroll-left, .animate-on-scroll-right');
+    animatedElements.forEach(el => {
+      this.scrollObserver.observe(el);
+    });
   }
 
   async loadLocations(): Promise<void> {
@@ -75,7 +107,26 @@ export class ArabicComponent implements OnInit {
     for (let key in this.rinterests) {
       this.rinterests[key] = false;
     }
+    this.interestSearchQuery = '';
     this.researchers = this.profiles;
+  }
+
+  // Get filtered interests based on search query
+  getFilteredInterests(): string[] {
+    const interests = Object.keys(this.rinterests);
+    if (!this.interestSearchQuery.trim()) {
+      // Sort by frequency (most common first)
+      return interests.sort((a, b) => this.rinterestsFreq[b] - this.rinterestsFreq[a]);
+    }
+    const query = this.interestSearchQuery.toLowerCase().trim();
+    return interests
+      .filter(interest => interest.toLowerCase().includes(query))
+      .sort((a, b) => this.rinterestsFreq[b] - this.rinterestsFreq[a]);
+  }
+
+  // Get count of selected interests
+  getSelectedInterestsCount(): number {
+    return Object.values(this.rinterests).filter(v => v).length;
   }
 
   editProfile(researcher:IResearcher) {
