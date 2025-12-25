@@ -1,6 +1,6 @@
 # Egyptians in Computer Science
 
-A web application showcasing prominent Egyptian researchers in Computer Science and AI. Features an interactive world map, hierarchical research area filtering, and researcher profiles with academic metrics.
+A web application showcasing prominent Egyptian researchers in Computer Science. Features an interactive world map, hierarchical research area filtering, and researcher profiles with academic metrics.
 
 **Live Website**: [https://egyptians-in-cs.github.io/Egyptians-in-cs/](https://egyptians-in-cs.github.io/Egyptians-in-cs/)
 
