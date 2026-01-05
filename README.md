@@ -2,7 +2,7 @@
 
 A web application showcasing prominent Egyptian researchers in Computer Science. Features an interactive world map, hierarchical research area filtering, and researcher profiles with academic metrics.
 
-**Live Website**: [https://egyptians-in-cs.github.io/Egyptians-in-cs/](https://egyptians-in-cs.github.io/Egyptians-in-cs/)
+**Live Website**: [https://egyptians-in-cs.github.io/egyptians-in-cs/](https://egyptians-in-cs.github.io/egyptians-in-cs/)
 
 ![Preview](src/assets/thumbnail.png)
 
@@ -55,7 +55,7 @@ Visit `http://localhost:4200` in your browser.
 npm run build
 
 # Build for GitHub Pages (outputs to /docs folder)
-ng build --configuration production --output-path docs --base-href /egyptians-in-ai/
+ng build --configuration production --output-path docs --base-href https://egyptians-in-cs.github.io/
 ```
 
 ---

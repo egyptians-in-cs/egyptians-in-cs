@@ -4,6 +4,7 @@ import time
 import datetime
 from tqdm import tqdm 
 from scholarly import scholarly
+from populate import download_and_resize_image
 
 def write_json(path, data):
     with open(path, 'w') as fout:
@@ -16,7 +17,7 @@ def read_json(path):
 
 if __name__ == "__main__":
 
-    out_file = "./assets/researchers_en_update.json"
+    out_file = "./assets/researchers_en.json"
     # 57, 105, 106
     researchers = read_json("./assets/researchers_en.json")
 
@@ -35,12 +36,40 @@ if __name__ == "__main__":
             try:
                 author = scholarly.fill(scholarly.search_author_id(scholar_id))
                 if author["hindex"] != researcher["hindex"]:
-                    print(f"Updating {researcher['name']} h-index: {researcher['hindex']} --> {author['hindex']}") 
+                    print(f"> Updating {researcher['name']} h-index: {researcher['hindex']} --> {author['hindex']}") 
                 researcher["hindex"] = author['hindex']
                 researcher["citedby"] = author["citedby"]
                 researcher["lastupdate"] = formatted_date
-            except:
-                print(f"[Error] {researcher['name']}")
+
+                if researcher["affiliation"].strip() in ["", "NaN", "nan", None]:
+                    researcher["affiliation"] = author["affiliation"]
+                    print(f"> Updating affiliation for {researcher['name']} --> {researcher['affiliation']}")
+
+                if researcher["photo"] in ["", "NaN", "nan", None, "./assets/images/default.jpg"]:
+                    photo_url = author.get("url_picture", "")
+                    if photo_url.strip() != "":
+                        print(f"Downloading photo for {researcher['name']}")
+                        photo_path = f"./assets/images/{researcher['name'].replace(' ', '-').lower()}.jpg"
+                        researcher["photo"] = download_and_resize_image(photo_url, photo_path)
+                        print(f"> Downloaded photo for {researcher['name']}")
+
+                if researcher["website"].strip() in ["", "NaN", "nan", None]:
+                    researcher["website"] = author.get("homepage", "")
+                    if researcher["website"].strip() != "":
+                        print(f"> Updating website for {researcher['name']} --> {researcher['website']}")
+
+
+                if researcher["interests"] == []:
+                    interests = author.get("interests", [])
+                    researcher["interests"] = interests
+                    print(f"> Updating interests for {researcher['name']} --> {researcher['interests']}")
+
+                if "standardized_interests" not in researcher or researcher["standardized_interests"] == []:
+                    researcher["standardized_interests"] = interests
+                    print(f"> Updating standardized_interests for {researcher['name']} --> {researcher['standardized_interests']}")
+
+            except Exception as e:
+                print(f"[Error] {researcher['name']}: {e}")
                 continue 
         else:
             if "lastupdate" not in researcher:
