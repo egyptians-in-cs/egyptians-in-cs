@@ -90,24 +90,17 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
   }
 
+  private customIcon!: L.DivIcon;
+
   private initMap(): void {
-    // Fix for default marker icons in Angular
-    const iconRetinaUrl = 'assets/marker-icon-2x.png';
-    const iconUrl = 'assets/marker-icon.png';
-    const shadowUrl = 'assets/marker-shadow.png';
-
-    const iconDefault = L.icon({
-      iconRetinaUrl,
-      iconUrl,
-      shadowUrl,
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      tooltipAnchor: [16, -28],
-      shadowSize: [41, 41]
+    // Create custom icon after Leaflet is loaded
+    this.customIcon = L.divIcon({
+      className: 'custom-marker',
+      html: '<div class="marker-pin"></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+      popupAnchor: [0, -12]
     });
-
-    L.Marker.prototype.options.icon = iconDefault;
 
     this.map = L.map(this.mapId, {
       center: [25, 20],
@@ -147,7 +140,14 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     this.researchers.forEach(researcher => {
       if (researcher.location) {
-        const marker = L.marker([researcher.location.lat, researcher.location.lng]);
+        const marker = L.circleMarker([researcher.location.lat, researcher.location.lng], {
+          radius: 8,
+          fillColor: '#1C8394',
+          color: '#091B2B',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9
+        });
         marker.bindPopup(this.createPopup(researcher), {
           maxWidth: 250,
           className: 'researcher-popup-container'
@@ -164,7 +164,14 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
       this.markers.clearLayers();
       this.researchers.forEach(researcher => {
         if (researcher.location) {
-          const marker = L.marker([researcher.location.lat, researcher.location.lng]);
+          const marker = L.circleMarker([researcher.location.lat, researcher.location.lng], {
+            radius: 8,
+            fillColor: '#1C8394',
+            color: '#091B2B',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+          });
           marker.bindPopup(this.createPopup(researcher), {
             maxWidth: 250,
             className: 'researcher-popup-container'

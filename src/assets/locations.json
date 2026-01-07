@@ -133,6 +133,7 @@
   "Stanford University": { "lat": 37.4275, "lng": -122.1697, "country": "USA", "city": "Stanford" },
   "Stanford's HAI": { "lat": 37.4275, "lng": -122.1697, "country": "USA", "city": "Stanford" },
   "Tartu University": { "lat": 58.3799, "lng": 26.7222, "country": "Estonia", "city": "Tartu" },
+  "Tartu university": { "lat": 58.3799, "lng": 26.7222, "country": "Estonia", "city": "Tartu" },
   "The British University in Dubai": { "lat": 25.2048, "lng": 55.2708, "country": "UAE", "city": "Dubai" },
   "Thousand Brains Project": { "lat": 37.7749, "lng": -122.4194, "country": "USA", "city": "San Francisco" },
   "Twitter": { "lat": 37.7749, "lng": -122.4194, "country": "USA", "city": "San Francisco" },
