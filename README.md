@@ -21,6 +21,7 @@ A web application showcasing prominent Egyptian researchers in Computer Science.
 ## Features
 
 - **Interactive World Map**: Visualize where Egyptian researchers are located globally using Leaflet.js with marker clustering
+- **Statistics Dashboard**: Interactive charts showing geographic distribution, research areas, h-index/citations histograms, academia vs industry breakdown, and top researchers rankings
 - **Hierarchical Research Areas**: Browse 16 main tracks, 87 subtracks, and 594 research areas
 - **Researcher Profiles**: Display researcher information including h-index, citations, affiliations, and social links
 - **Bilingual Support**: Full English and Arabic (RTL) interfaces
@@ -33,6 +34,7 @@ A web application showcasing prominent Egyptian researchers in Computer Science.
 - **Frontend**: Angular 14
 - **Styling**: Tailwind CSS 3.4
 - **Maps**: Leaflet.js with MarkerCluster
+- **Charts**: Chart.js
 - **Icons**: Font Awesome 6
 - **Fonts**: Inter, Merriweather, Noto Sans Arabic
 
@@ -82,6 +84,7 @@ egyptians-in-cs.github.io/
 │   │   ├── arabic/              # Arabic (RTL) component
 │   │   ├── english/             # English component
 │   │   ├── map/                 # Interactive world map component
+│   │   ├── statistics/          # Statistics dashboard with Chart.js
 │   │   ├── app.component.*      # Root component (navbar, footer)
 │   │   ├── filter.service.ts    # Filtering and sorting logic
 │   │   ├── location.service.ts  # Location enrichment for map
