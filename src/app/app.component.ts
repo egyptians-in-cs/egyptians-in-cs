@@ -14,6 +14,7 @@ export class AppComponent implements OnInit {
   mobileMenuOpen: boolean = false;
   dropdownOpen: boolean = false;
   isDarkMode: boolean = false;
+  showStats: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,10 +29,25 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
       this.router.events.subscribe(val => {
           if (val instanceof RoutesRecognized) {
-              let lang = val.url.slice(1);
-              this.changeLang(lang);
+              const url = val.url;
+              // Check if we're on the stats page
+              this.showStats = url.includes('/stats');
+              // Extract language
+              if (url.includes('/ar')) {
+                this.en_active = false;
+              } else {
+                this.en_active = true;
+              }
+              this.mobileMenuOpen = false;
           }
       });
+
+      // Also check initial URL
+      const initialUrl = window.location.hash || window.location.pathname;
+      this.showStats = initialUrl.includes('/stats');
+      if (initialUrl.includes('/ar')) {
+        this.en_active = false;
+      }
   }
 
   changeLang(lang: string): void {
