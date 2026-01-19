@@ -1,0 +1,186 @@
+<div class="statistics-page" [class.rtl]="lang === 'ar'" [dir]="lang === 'ar' ? 'rtl' : 'ltr'">
+  <!-- Header -->
+  <header class="stats-header">
+    <div class="header-content">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas" [class.fa-arrow-left]="lang === 'en'" [class.fa-arrow-right]="lang === 'ar'"></i>
+        {{ t.backToHome }}
+      </button>
+      <h1>{{ t.statistics }}</h1>
+      <button class="lang-toggle" (click)="toggleLanguage()">
+        {{ lang === 'en' ? 'العربية' : 'English' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- Overview Section -->
+  <section class="overview-section">
+    <p class="overview-text">{{ t.overview }}</p>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="card-content">
+          <span class="card-value">{{ summaryStats?.totalResearchers }}</span>
+          <span class="card-label">{{ t.totalResearchers }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="card-content">
+          <span class="card-value">{{ summaryStats?.avgHIndex }}</span>
+          <span class="card-label">{{ t.avgHIndex }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-quote-right"></i>
+        </div>
+        <div class="card-content">
+          <span class="card-value">{{ formatNumber(summaryStats?.totalCitations || 0) }}</span>
+          <span class="card-label">{{ t.totalCitations }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="card-content">
+          <span class="card-value">{{ summaryStats?.highestHIndex }}</span>
+          <span class="card-label">{{ t.highestHIndex }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts Grid -->
+  <section class="charts-section">
+    <div class="charts-grid">
+      <!-- Geographic Distribution -->
+      <div class="chart-card wide">
+        <h3 class="chart-title">
+          <i class="fas fa-globe-americas"></i>
+          {{ t.geographicDistribution }}
+        </h3>
+        <div class="chart-container horizontal-bar">
+          <canvas #countryChart></canvas>
+        </div>
+      </div>
+
+      <!-- Research Areas -->
+      <div class="chart-card wide">
+        <h3 class="chart-title">
+          <i class="fas fa-microscope"></i>
+          {{ t.researchAreas }}
+        </h3>
+        <div class="chart-container research-areas">
+          <canvas #researchAreaChart></canvas>
+        </div>
+      </div>
+
+      <!-- H-Index Distribution -->
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-bar"></i>
+          {{ t.hIndexDistribution }}
+        </h3>
+        <div class="chart-container">
+          <canvas #hindexChart></canvas>
+        </div>
+      </div>
+
+      <!-- Citations Distribution -->
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-quote-left"></i>
+          {{ t.citationsDistribution }}
+        </h3>
+        <div class="chart-container">
+          <canvas #citationsChart></canvas>
+        </div>
+      </div>
+
+      <!-- Academia vs Industry -->
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-building"></i>
+          {{ t.academiaVsIndustry }}
+        </h3>
+        <div class="chart-container doughnut">
+          <canvas #sectorChart></canvas>
+        </div>
+      </div>
+
+      <!-- Position Distribution -->
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-user-tie"></i>
+          {{ t.positionDistribution }}
+        </h3>
+        <div class="chart-container horizontal-bar">
+          <canvas #positionChart></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Researchers Table -->
+  <section class="top-researchers-section">
+    <div class="table-card">
+      <div class="table-header">
+        <h3 class="chart-title">
+          <i class="fas fa-star"></i>
+          {{ t.topResearchers }}
+        </h3>
+        <div class="tab-buttons">
+          <button
+            class="tab-btn"
+            [class.active]="topResearchersTab === 'hindex'"
+            (click)="switchTab('hindex')">
+            {{ t.byHIndex }}
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="topResearchersTab === 'citations'"
+            (click)="switchTab('citations')">
+            {{ t.byCitations }}
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="researchers-table">
+          <thead>
+            <tr>
+              <th>{{ t.rank }}</th>
+              <th>{{ t.name }}</th>
+              <th>{{ t.affiliation }}</th>
+              <th>{{ t.hIndex }}</th>
+              <th>{{ t.citations }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let researcher of (topResearchersTab === 'hindex' ? topByHIndex : topByCitations); let i = index">
+              <td class="rank-cell">{{ i + 1 }}</td>
+              <td class="name-cell">
+                <img [src]="researcher.photo" [alt]="researcher.name" class="researcher-photo" onerror="this.src='assets/default-avatar.png'">
+                <span>{{ researcher.name }}</span>
+              </td>
+              <td class="affiliation-cell">{{ researcher.affiliation }}</td>
+              <td class="metric-cell" [class.highlight]="topResearchersTab === 'hindex'">{{ researcher.hindex }}</td>
+              <td class="metric-cell" [class.highlight]="topResearchersTab === 'citations'">{{ formatNumber(researcher.citedby) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

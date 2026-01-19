@@ -55,6 +55,26 @@ export class LocationService {
       return this.locationMap[normalized];
     }
 
+    // Handle compound affiliations (e.g., "Brown University| Meta", "University of Waterloo, Apple")
+    const separators = /[|,&\/;]/;
+    if (separators.test(affiliation)) {
+      const parts = affiliation.split(separators).map(p => p.trim());
+      for (const part of parts) {
+        if (this.locationMap[part]) {
+          return this.locationMap[part];
+        }
+      }
+      // Try partial match on each part
+      for (const part of parts) {
+        const result = this.findLocationForPart(part);
+        if (result) return result;
+      }
+    }
+
+    return this.findLocationForPart(affiliation);
+  }
+
+  private findLocationForPart(affiliation: string): ILocation | undefined {
     // Partial match - check if any key is contained in the affiliation
     const keys = Object.keys(this.locationMap);
 
