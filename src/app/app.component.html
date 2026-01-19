@@ -23,18 +23,30 @@
           <i class="fa-brands fa-github"></i>
           <span>GitHub</span>
         </a>
-        <a href="https://bkhmsi.medium.com/egyptian-researchers-in-computer-science-6879cdaf84db"
-           target="_blank"
-           class="flex items-center gap-2 text-navy-200 hover:text-gold-400 transition-colors">
-          <i class="fa-brands fa-medium"></i>
-          <span>Badr's Blog</span>
-        </a>
-        <a href="https://medium.com/@mdawoud_2100/egyptian-researchers-in-computer-science-mohamed-moustafa-dawoud-b8e5f358c559?postPublishedType=repub"
-           target="_blank"
-           class="flex items-center gap-2 text-navy-200 hover:text-gold-400 transition-colors">
-          <i class="fa-brands fa-medium"></i>
-          <span>Mohamed's Blog</span>
-        </a>
+        <!-- Blogs Dropdown -->
+        <div class="relative group">
+          <button class="flex items-center gap-2 text-navy-200 hover:text-gold-400 transition-colors">
+            <i class="fa-brands fa-medium"></i>
+            <span>Blogs</span>
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </button>
+          <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-elevated
+                      opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                      transition-all duration-200 transform origin-top-right">
+            <div class="py-2">
+              <a href="https://bkhmsi.medium.com/egyptian-researchers-in-computer-science-6879cdaf84db"
+                 target="_blank"
+                 class="block px-4 py-2 text-navy-900 hover:bg-navy-50 transition-colors">
+                Badr's Blog
+              </a>
+              <a href="https://medium.com/@mdawoud_2100/egyptian-researchers-in-computer-science-mohamed-moustafa-dawoud-b8e5f358c559?postPublishedType=repub"
+                 target="_blank"
+                 class="block px-4 py-2 text-navy-900 hover:bg-navy-50 transition-colors">
+                Mohamed's Blog
+              </a>
+            </div>
+          </div>
+        </div>
         <a href="https://www.youtube.com/watch?v=PtdyHfpzodg"
            target="_blank"
            class="flex items-center gap-2 text-navy-200 hover:text-gold-400 transition-colors">
@@ -149,18 +161,6 @@
           <i class="fa-brands fa-github w-5"></i>
           <span>GitHub</span>
         </a>
-        <a href="https://bkhmsi.medium.com/egyptian-researchers-in-computer-science-6879cdaf84db"
-           target="_blank"
-           class="flex items-center gap-3 px-4 py-2 text-navy-200 hover:text-white hover:bg-navy-800 rounded-lg transition-colors">
-          <i class="fa-brands fa-medium w-5"></i>
-          <span>Badr's Blog</span>
-        </a>
-        <a href="https://medium.com/@mdawoud_2100/egyptian-researchers-in-computer-science-mohamed-moustafa-dawoud-b8e5f358c559?postPublishedType=repub"
-           target="_blank"
-           class="flex items-center gap-3 px-4 py-2 text-navy-200 hover:text-white hover:bg-navy-800 rounded-lg transition-colors">
-          <i class="fa-brands fa-medium w-5"></i>
-          <span>Mohamed's Blog</span>
-        </a>
         <a href="https://www.youtube.com/watch?v=PtdyHfpzodg"
            target="_blank"
            class="flex items-center gap-3 px-4 py-2 text-navy-200 hover:text-white hover:bg-navy-800 rounded-lg transition-colors">
@@ -172,6 +172,25 @@
           <i class="fa-solid fa-chart-pie w-5"></i>
           <span>{{ en_active ? 'Statistics' : 'الإحصائيات' }}</span>
         </a>
+
+        <!-- Blogs (Mobile) -->
+        <div class="pt-3 border-t border-navy-700">
+          <div class="px-4 py-2 text-sm text-navy-400 uppercase tracking-wide">
+            Blogs
+          </div>
+          <a href="https://bkhmsi.medium.com/egyptian-researchers-in-computer-science-6879cdaf84db"
+             target="_blank"
+             class="flex items-center gap-3 px-4 py-2 text-navy-200 hover:text-white hover:bg-navy-800 rounded-lg transition-colors">
+            <i class="fa-brands fa-medium w-5"></i>
+            <span>Badr's Blog</span>
+          </a>
+          <a href="https://medium.com/@mdawoud_2100/egyptian-researchers-in-computer-science-mohamed-moustafa-dawoud-b8e5f358c559?postPublishedType=repub"
+             target="_blank"
+             class="flex items-center gap-3 px-4 py-2 text-navy-200 hover:text-white hover:bg-navy-800 rounded-lg transition-colors">
+            <i class="fa-brands fa-medium w-5"></i>
+            <span>Mohamed's Blog</span>
+          </a>
+        </div>
 
         <!-- X in Y Links (Mobile) -->
         <div class="pt-3 border-t border-navy-700">
