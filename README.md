@@ -429,7 +429,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Mohamed Moustafa Dawoud** · [Website](https://momodawoud.github.io) · [Twitter](https://x.com/mohamedmustfaaa) · [LinkedIn](https://www.linkedin.com/in/mohamedmostafadawod/)
 
-Have questions or suggestions? Feel free to reach out or [open an issue](https://github.com/egyptians-in-cs/Egyptians-in-cs/issues).
+Have questions or suggestions? Feel free to reach out or [open an issue](https://github.com/egyptians-in-cs/egyptians-in-cs/issues).
 
 ---
 
