@@ -1,3 +1,5 @@
+# LEGACY -- superseded by: the h-index check inside pipeline.py fetch
+# Kept for reference; the pipeline no longer calls it.
 import re
 import json 
 import time

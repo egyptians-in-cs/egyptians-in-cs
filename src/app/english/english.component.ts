@@ -145,6 +145,22 @@ export class EnglishComponent implements OnInit, AfterViewInit {
       .slice(0, 2);
   }
 
+  // Format the date the Scholar metrics were last read ("2026-09-04" -> "Sep 4, 2026").
+  // Parsed from parts rather than new Date(string), which reads a bare ISO date as
+  // UTC and shows the previous day to anyone west of Greenwich.
+  formatLastUpdate(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const [year, month, day] = value.split('-').map(Number);
+    if (!year || !month || !day) {
+      return value;
+    }
+    return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  }
+
   // Generate background color from name
   getInitialsColor(name: string): string {
     const colors = [

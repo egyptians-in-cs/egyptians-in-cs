@@ -112,6 +112,22 @@ export class ArabicComponent implements OnInit, AfterViewInit {
   }
 
   // Get filtered interests based on search query
+  // Format the date the Scholar metrics were last read ("2026-09-04" -> "٤ سبتمبر ٢٠٢٦").
+  // Parsed from parts rather than new Date(string), which reads a bare ISO date as
+  // UTC and shows the previous day to anyone west of Greenwich.
+  formatLastUpdate(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const [year, month, day] = value.split('-').map(Number);
+    if (!year || !month || !day) {
+      return value;
+    }
+    return new Date(year, month - 1, day).toLocaleDateString('ar-EG', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  }
+
   getFilteredInterests(): string[] {
     const interests = Object.keys(this.rinterests);
     if (!this.interestSearchQuery.trim()) {

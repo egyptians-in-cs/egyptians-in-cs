@@ -41,3 +41,19 @@ testem.log
 .DS_Store
 Thumbs.db
 *.pyc
+token.json
+credentials.json
+download_token_gdrive.py
+tmp
+
+# Raw Google Form responses and the pipeline's working files. These carry
+# submitters' personal data (including email addresses) and everything under
+# src/assets/ is published with the site, so they stay local.
+src/assets/researchers.csv
+src/assets/researchers_new.json
+src/assets/researchers_update.json
+src/assets/review.json
+src/assets/tmp/
+
+# Local Claude Code workspace config
+.claude/

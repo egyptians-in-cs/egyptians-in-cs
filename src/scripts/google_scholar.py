@@ -1,3 +1,5 @@
+# LEGACY -- superseded by: python3 scripts/pipeline.py refresh (OpenAlex, not scraped)
+# Kept for reference; the pipeline no longer calls it.
 import re
 import json 
 import time
@@ -60,12 +62,11 @@ if __name__ == "__main__":
 
 
                 if researcher["interests"] == []:
-                    interests = author.get("interests", [])
-                    researcher["interests"] = interests
+                    researcher["interests"] = author.get("interests", [])
                     print(f"> Updating interests for {researcher['name']} --> {researcher['interests']}")
 
                 if "standardized_interests" not in researcher or researcher["standardized_interests"] == []:
-                    researcher["standardized_interests"] = interests
+                    researcher["standardized_interests"] = list(researcher["interests"])
                     print(f"> Updating standardized_interests for {researcher['name']} --> {researcher['standardized_interests']}")
 
             except Exception as e:

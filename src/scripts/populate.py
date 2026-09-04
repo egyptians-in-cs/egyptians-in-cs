@@ -1,62 +1,108 @@
+# LEGACY -- superseded by: python3 scripts/pipeline.py fetch
+# Kept for reference; the pipeline no longer calls it.
+"""Split the Google Form submissions into "new" and "update" researcher batches.
+
+Reads the form responses sheet, keeps every submission newer than LAST_UPDATE,
+downloads each submitted photo, and writes:
+
+    assets/researchers_new.json     researchers to append to the directory
+    assets/researchers_update.json  edits to researchers already in it
+
+Both files are consumed by check_new_submissions.py / merge_new_submissions.py
+(see update_researchers.sh). Bump LAST_UPDATE after every successful run.
+"""
+
+import io
 import os
+import re
 import json
+import argparse
+from datetime import datetime
+
 import requests
 import pandas as pd
 from PIL import Image
-from io import BytesIO
-from datetime import datetime
 
 # ---- CONFIG ----
 SHEET_ID = "1TTl82-dODXtCMNZr47TUPj939tiIzZP7zmFuAVx9RgE"
 GID = "825523298"  # change if you want a different tab
-OUTPUT_PATH = "./assets/researchers.csv"
+LAST_UPDATE = "03/16/2026"  # only submissions from this date on are processed
+PHOTO_SIZE = (200, 200)
 # ----------------
 
-def download_and_resize_image(url: str, output_path: str, size=(200, 200)) -> str:
-    """
-    Downloads an image from a URL, resizes it, and saves it.
+# Paths are anchored to src/ so the script runs from anywhere, but the paths
+# stored inside the JSON stay relative ("./assets/...") for the website.
+SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CSV_PATH = "./assets/researchers.csv"
+RESEARCHERS_PATH = "./assets/researchers_en.json"
+NEW_PATH = "./assets/researchers_new.json"
+UPDATE_PATH = "./assets/researchers_update.json"
+IMAGES_DIR = "./assets/images"
+TMP_DIR = "./assets/tmp"
+DEFAULT_PHOTO = "./assets/images/default.jpg"
 
-    Args:
-        url: Direct link to the image.
-        output_path: Where to save the resized image (including filename).
-        size: Tuple of (width, height). Defaults to (200, 200).
-    """
+TIMESTAMP_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-    if is_nan(url) or url.strip() in ["", "NaN", "nan"]:
-        print(f"No URL provided for image. Skipping download.")
-        return "./assets/images/default.jpg"
+# The form asks the same questions twice (once to add, once to update), so
+# pandas suffixes the second block of columns with ".1".
+ADD_COLUMNS = {
+    "name": "Name",
+    "affiliation": "Affiliation",
+    "position": "Position",
+    "scholar": "Google Scholar Profile Link",
+    "linkedin": "LinkedIn Profile",
+    "twitter": "Twitter Profile",
+    "website": "Personal Website",
+    "interests": "Research Interests",
+    "photo": "Personal Photo",
+}
 
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        image = Image.open(BytesIO(response.content))
-        image = image.convert("RGB")  # ensure compatibility for JPG/PNG/etc
-        if image.size[0] < size[0] or image.size[1] < size[1]:
-            print(f"Image from {url} is smaller than the desired size {size}. Skipping resize.")
-        else:
-            image = image.resize(size, Image.LANCZOS)
+UPDATE_COLUMNS = {
+    "name": "Name.1",
+    "affiliation": "Affiliation.1",
+    "position": "Position.1",
+    "scholar": "Google Scholar Profile",  # not a duplicate header, so no ".1"
+    "linkedin": "LinkedIn Profile.1",
+    "twitter": "Twitter Profile.1",
+    "website": "Personal Website.1",
+    "interests": "Research Interests.1",
+    "photo": "Personal Photo.1",
+}
 
-    except Exception as e:
-        print(f"Error downloading or processing image from {url}: {e}")
-        return "./assets/images/default.jpg"
-
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    image.save(output_path)
-
-    print(f"Saved resized image to {output_path}")
-    return output_path
-
-def is_nan(string):
-    return string != string
 
 def read_json(file):
     with open(file, 'r', encoding='utf-8') as fin:
         data = json.load(fin)
-    return data 
+    return data
+
 
 def write_json(file, data):
     with open(file, 'w', encoding="utf-8") as fout:
         json.dump(data, fout, ensure_ascii=False)
+
+
+def abs_path(path):
+    """Resolve a "./assets/..." path against src/."""
+    return os.path.join(SRC_DIR, path)
+
+
+def text(value):
+    """Normalise a cell into a stripped string ("" for blanks/NaN)."""
+    if value is None or pd.isna(value):
+        return ""
+    return str(value).strip()
+
+
+def slugify(name):
+    return name.replace(' ', '-').lower()
+
+
+def parse_timestamp(value):
+    try:
+        return datetime.strptime(text(value), TIMESTAMP_FORMAT)
+    except ValueError:
+        return None
+
 
 def download_google_sheet_csv(sheet_id, gid, output_path):
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export"
@@ -68,87 +114,105 @@ def download_google_sheet_csv(sheet_id, gid, output_path):
     response = requests.get(url, params=params)
     response.raise_for_status()
 
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    os.makedirs(os.path.dirname(abs_path(output_path)), exist_ok=True)
 
-    with open(output_path, "wb") as f:
+    with open(abs_path(output_path), "wb") as f:
         f.write(response.content)
 
     print(f"Downloaded sheet to {output_path}")
 
-if __name__ == "__main__":
 
-    if not os.path.exists(OUTPUT_PATH):
-        download_google_sheet_csv(SHEET_ID, GID, OUTPUT_PATH)
+# Photo helpers live in lib.py now; re-exported so google_scholar.py keeps working.
+from lib import (download_and_resize_image, download_image_gdrive,  # noqa: F401
+                 gdrive_file_id)
 
-    out_new_file = "./assets/researchers_new.json"
-    out_update_file = "./assets/researchers_update.json"
 
-    researchers = read_json('./assets/researchers_en.json')
-    responses = pd.read_csv(OUTPUT_PATH, header=0)
+def build_researcher(response, columns):
+    """Turn one form response into a researcher entry."""
+    name = text(response[columns["name"]])
+    interests = text(response[columns["interests"]])
+
+    return {
+        "name": name,
+        "affiliation": text(response[columns["affiliation"]]),
+        "position": text(response[columns["position"]]),
+        "hindex": -1,
+        "photo": download_and_resize_image(
+            response[columns["photo"]], f"{IMAGES_DIR}/{slugify(name)}.jpg"
+        ),
+        "scholar": text(response[columns["scholar"]]),
+        "linkedin": text(response[columns["linkedin"]]),
+        "website": text(response[columns["website"]]),
+        "twitter": text(response[columns["twitter"]]),
+        "interests": [i.strip() for i in interests.split(",") if i.strip()],
+        "citedby": 0,
+        "lastupdate": "",
+    }
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--since", default=LAST_UPDATE, metavar="MM/DD/YYYY",
+                        help=f"process submissions from this date on (default: {LAST_UPDATE})")
+    parser.add_argument("--refresh", action="store_true",
+                        help="re-download the sheet even if the CSV is already there")
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    last_update = datetime.strptime(args.since, "%m/%d/%Y")
+
+    if args.refresh or not os.path.exists(abs_path(CSV_PATH)):
+        download_google_sheet_csv(SHEET_ID, GID, CSV_PATH)
+
+    researchers = read_json(abs_path(RESEARCHERS_PATH))
+    responses = pd.read_csv(abs_path(CSV_PATH), header=0)
+
+    known_names = {entry["name"].strip() for entry in researchers}
+    added_names = set()
 
     new_researchers = []
     to_update_researchers = []
 
-    last_update = datetime.strptime("11/24/2025", "%m/%d/%Y")
-
-    names = [entry["name"] for entry in researchers]
-
     for idx in range(len(responses)):
         response = responses.iloc[idx]
-        add_flag = response["Add or Update"] == "Add"
-        timestamp = datetime.strptime(response["Timestamp"], "%m/%d/%Y %H:%M:%S")
+
+        timestamp = parse_timestamp(response["Timestamp"])
+        if timestamp is None:
+            print(f"> [Skip] row {idx + 2}: unreadable timestamp {response['Timestamp']!r}")
+            continue
         if timestamp < last_update:
             continue
-        
-        if add_flag and not pd.isna(response["Name"]):
-            name = response["Name"].strip()
-            photo_link = response["Personal Photo Link"]
-            scholar = str(response["Google Scholar Profile Link"]).strip()
-            linkedin = response["LinkedIn Profile"]
-            twitter = response["Twitter Profile"]
-            website = response["Personal Website"]
-            interests = [interest.strip() for interest in response["Research Interests"].split(",")] if not pd.isna(response["Research Interests"]) else []
-            photo_path = f"./assets/images/{name.replace(' ', '-').lower()}.jpg"
-            if name not in names:
-                print(f"> [Add] {name}")
-                new_researchers += [{
-                    "name": name,
-                    "affiliation": str(response["Affiliation"]).strip(),
-                    "position": str(response["Position"]).strip(),
-                    "hindex": -1,
-                    "photo": download_and_resize_image(photo_link, photo_path),
-                    "scholar": scholar,
-                    "linkedin": "" if is_nan(linkedin) else linkedin,
-                    "website": "" if is_nan(website) else website,
-                    "twitter": "" if is_nan(twitter) else twitter,
-                    "interests": interests,
-                    "citedby": 0,
-                    "lastupdate": ""
-                }]
-        elif not pd.isna(response["Name.1"]):
-            name = response["Name.1"].strip()
-            photo_link = response["Personal Photo Link.1"]
-            scholar = str(response["Google Scholar Profile"]).strip()
-            linkedin = response["LinkedIn Profile.1"]
-            twitter = response["Twitter Profile.1"]
-            website = response["Personal Website.1"]
-            interests = [interest.strip() for interest in response["Research Interests.1"].split(",")] if not pd.isna(response["Research Interests.1"]) else []
+
+        is_add = text(response["Add or Update"]).lower() == "add"
+        name = text(response[ADD_COLUMNS["name"] if is_add else UPDATE_COLUMNS["name"]])
+
+        if not name:
+            print(f"> [Skip] row {idx + 2}: no name given")
+            continue
+
+        if is_add:
+            if name in known_names:
+                print(f"> [Skip] {name} is already in the directory")
+                continue
+            if name in added_names:
+                print(f"> [Skip] {name} was submitted twice in this batch")
+                continue
+            print(f"> [Add] {name}")
+            added_names.add(name)
+            new_researchers += [build_researcher(response, ADD_COLUMNS)]
+        else:
+            if name not in known_names:
+                print(f"> [Warn] {name} is not in the directory, the update will be a no-op")
             print(f"> [Update] {name}")
-            photo_path = f"./assets/images/{name.replace(' ', '-').lower()}.jpg"
-            to_update_researchers += [{
-                    "name": name,
-                    "affiliation": str(response["Affiliation.1"]).strip(),
-                    "position": str(response["Position.1"]).strip(),
-                    "hindex": -1,
-                    "photo": download_and_resize_image(photo_link, photo_path),
-                    "scholar": scholar,
-                    "linkedin": "" if is_nan(linkedin) else linkedin,
-                    "website": "" if is_nan(website) else website,
-                    "twitter": "" if is_nan(twitter) else twitter,
-                    "interests": interests,
-                    "citedby": 0,
-                    "lastupdate": ""
-                }]
-            
-    write_json(out_new_file, new_researchers)
-    write_json(out_update_file, to_update_researchers)
+            to_update_researchers += [build_researcher(response, UPDATE_COLUMNS)]
+
+    write_json(abs_path(NEW_PATH), new_researchers)
+    write_json(abs_path(UPDATE_PATH), to_update_researchers)
+    print(f"\n{len(new_researchers)} to add, {len(to_update_researchers)} to update "
+          f"(submissions since {args.since})")
+
+
+if __name__ == "__main__":
+    main()
