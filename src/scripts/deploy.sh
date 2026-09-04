@@ -97,4 +97,4 @@ step "5/5  Push to main (triggers the Pages workflow)"
 git push origin main
 
 printf '\n\033[1mPushed.\033[0m Watch the deploy:\n'
-echo "  https://github.com/egyptians-in-cs/egyptians-in-cs/actions"
+echo "  https://github.com/egyptians-in-cs/egyptians-in-cs.github.io/actions"
