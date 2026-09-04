@@ -33,13 +33,13 @@ by hand to overrule the default. `apply` acts on whatever the file says.
 
 ## Why you no longer bump a date
 
-`assets/pipeline_state.json` records the timestamp of every submission the pipeline
+`scripts/pipeline_state.json` records the timestamp of every submission the pipeline
 has handled, so `fetch` only ever proposes genuinely new rows and re-running any step
 is a no-op. `fetch --all` re-reads the whole sheet if you ever need it.
 
 ## What fetch flags for you
 
-* honorifics stripped from a name (`Dr. Hatem Keshk` → `Hatem Keshk`)
+* honorifics stripped from a name (`Dr. Firstname Lastname` → `Firstname Lastname`)
 * someone already in the directory, or submitted twice in the same batch
 * an update naming a researcher who does not exist
 * a missing photo, affiliation or Scholar link

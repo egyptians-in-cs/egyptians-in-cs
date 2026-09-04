@@ -10,20 +10,20 @@ A web application showcasing prominent Egyptian researchers in Computer Science.
 
 | Metric | Count |
 |--------|-------|
-| **Total Researchers** | 262 |
+| **Total Researchers** | 291 |
 | **Main Research Tracks** | 16 |
 | **Subtracks** | 87 |
 | **Research Areas** | 594 |
-| **Institutions Mapped** | 200+ |
+| **Affiliations Mapped** | 215 across 115 cities in 21 countries |
 
-*Last updated: January 2026*
+*Last updated: September 2026*
 
 ## Features
 
 - **Interactive World Map**: Visualize where Egyptian researchers are located globally using Leaflet.js with marker clustering
 - **Statistics Dashboard**: Interactive charts showing geographic distribution, research areas, h-index/citations histograms, academia vs industry breakdown, and top researchers rankings
 - **Hierarchical Research Areas**: Browse 16 main tracks, 87 subtracks, and 594 research areas
-- **Researcher Profiles**: Display researcher information including h-index, citations, affiliations, and social links
+- **Researcher Profiles**: Display researcher information including h-index, citations, affiliations, and social links, each card showing when its Scholar metrics were last read
 - **Bilingual Support**: Full English and Arabic (RTL) interfaces
 - **Advanced Filtering**: Filter by name, research area, or sort by h-index/citations
 - **Dark Mode**: System preference detection with manual toggle
@@ -68,10 +68,9 @@ Visit `http://localhost:4200` in your browser.
 ```bash
 # Build for production
 npm run build
-
-# Build for GitHub Pages (outputs to /docs folder)
-ng build --configuration production --output-path docs --base-href /
 ```
+
+Deployment is automatic — see [Deployment](#deployment-to-github-pages) below.
 
 ---
 
@@ -91,17 +90,18 @@ egyptians-in-cs.github.io/
 │   │   ├── theme.service.ts     # Dark mode management
 │   │   └── researchers.ts       # TypeScript interfaces
 │   ├── assets/
-│   │   ├── researchers_en.json  # Researcher data (262 entries)
+│   │   ├── researchers_en.json  # Researcher data (291 entries)
 │   │   ├── researchers_ar.json  # Researcher data (Arabic)
 │   │   ├── categories.json      # Research areas taxonomy
-│   │   ├── locations.json       # Affiliation to coordinates mapping
-│   │   └── images/              # Researcher photos (200+)
-│   ├── scripts/                 # Python utilities for data management
-│   │   ├── lib.py               # Shared helpers
+│   │   ├── locations.json       # Affiliation to city coordinates
+│   │   └── images/              # Researcher photos
+│   ├── scripts/                 # Data pipeline (see scripts/README.md)
 │   │   ├── pipeline.py          # fetch / review / apply / refresh / status
-│   │   └── scholar.py           # Google Scholar lookups
+│   │   ├── lib.py               # Shared helpers
+│   │   ├── scholar.py           # Google Scholar lookups
+│   │   ├── city_coords.py       # Snap affiliations to city centres
+│   │   └── deploy.sh            # Check, build and publish
 │   └── styles.css               # Global Tailwind styles
-├── docs/                        # Production build for GitHub Pages
 ├── tailwind.config.js           # Tailwind configuration
 ├── angular.json                 # Angular configuration
 └── package.json
@@ -123,19 +123,19 @@ Edit `src/assets/researchers_en.json` and add a new entry:
 
 ```json
 {
-  "name": "Ahmed Mohamed",
+  "name": "Firstname Lastname",
   "affiliation": "Cairo University",
   "position": "Associate Professor",
   "hindex": 25,
   "citedby": 3500,
-  "photo": "./assets/images/ahmed-mohamed.jpg",
+  "photo": "./assets/images/firstname-lastname.jpg",
   "scholar": "https://scholar.google.com/citations?user=XXXX",
-  "linkedin": "https://linkedin.com/in/ahmedmohamed",
-  "website": "https://ahmedmohamed.com",
-  "twitter": "https://twitter.com/ahmedmohamed",
+  "linkedin": "https://linkedin.com/in/username",
+  "website": "https://example.com",
+  "twitter": "https://twitter.com/username",
   "interests": ["Machine Learning", "Computer Vision", "Deep Learning"],
   "standardized_interests": ["Machine Learning", "Computer Vision", "Deep Learning"],
-  "lastupdate": "2026-01-07"
+  "lastupdate": "2026-09-04"
 }
 ```
 
@@ -145,18 +145,25 @@ Place the researcher's photo in `src/assets/images/` with the filename matching 
 
 #### Step 3: Update Location Mapping (Optional)
 
-If the affiliation isn't already in `src/assets/locations.json`, add it:
+If the affiliation isn't already in `src/assets/locations.json`, add it. **Use the
+coordinates of the city, not of the campus** — the map deliberately shows which city
+someone is in rather than which building, so every affiliation in a city shares one
+point:
 
 ```json
 {
-  "Cairo University": {
-    "lat": 30.0131,
-    "lng": 31.2089,
-    "country": "Egypt",
-    "city": "Cairo"
-  }
+  "Cairo University": { "lat": 30.0444, "lng": 31.2357, "country": "Egypt", "city": "Cairo" }
 }
 ```
+
+Rather than looking coordinates up by hand, add the entry with any coordinates and run:
+
+```bash
+cd src && python3 scripts/city_coords.py
+```
+
+It resolves every city through OpenStreetMap and rewrites all affiliations to their
+city centre, skipping any match that lands implausibly far from the existing point.
 
 ### Inclusion Criteria
 
@@ -256,25 +263,19 @@ this.map = L.map(this.mapId, {
 
 ## Deployment to GitHub Pages
 
-### Manual Deployment
+Every push to `main` is built and published by
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). Deploying is therefore
+just committing and pushing — but use the deploy script, which validates the data and
+runs a production build **before** the commit becomes public:
 
-1. Build the project:
 ```bash
-ng build --configuration production --output-path docs --base-href /
+src/scripts/deploy.sh                 # check, build, commit, push
+src/scripts/deploy.sh --check         # check and build only, change nothing
+src/scripts/deploy.sh -m "message"    # with a specific commit message
 ```
 
-2. Commit and push:
-```bash
-git add .
-git commit -m "Deploy to GitHub Pages"
-git push origin main
-```
-
-3. Configure GitHub Pages:
-   - Go to repository Settings → Pages
-   - Set Source to "Deploy from a branch"
-   - Select `main` branch and `/docs` folder
-   - Save
+The checks cover JSON validity, required fields, missing photo files, duplicate
+entries, and that no file holding raw form responses has become tracked by git.
 
 ---
 
@@ -313,29 +314,25 @@ changes in `assets/review.json` for you to approve. See
 | `name` | string | Yes | Full name |
 | `affiliation` | string | Yes | Current institution |
 | `position` | string | Yes | Academic title |
-| `hindex` | number | Yes | Google Scholar h-index |
-| `citedby` | number | Yes | Total citations |
+| `hindex` | number | Yes | Google Scholar h-index (set by `pipeline.py refresh`) |
+| `citedby` | number | Yes | Total citations (set by `pipeline.py refresh`) |
 | `photo` | string | Yes | Path to photo |
-| `scholar` | string | No | Google Scholar URL |
+| `scholar` | string | No | Google Scholar URL; a `user=` id is required for `refresh` to update the metrics |
 | `linkedin` | string | No | LinkedIn URL |
 | `website` | string | No | Personal website URL |
 | `twitter` | string | No | Twitter/X URL |
 | `interests` | string[] | Yes | Original research interests |
 | `standardized_interests` | string[] | Yes | Mapped to taxonomy |
-| `lastupdate` | string | Yes | Last update date (YYYY-MM-DD) |
+| `lastupdate` | string | Yes | When the metrics were last read from Scholar (YYYY-MM-DD); shown on each card |
 
 ### locations.json
 
-Maps institution names to coordinates for the world map:
+Maps institution names to **city centre** coordinates for the world map. Institutions
+in the same city share one point, so the map shows cities rather than exact locations:
 
 ```json
 {
-  "Institution Name": {
-    "lat": 30.0131,
-    "lng": 31.2089,
-    "country": "Egypt",
-    "city": "Cairo"
-  }
+  "Institution Name": { "lat": 30.0444, "lng": 31.2357, "country": "Egypt", "city": "Cairo" }
 }
 ```
 
