@@ -99,7 +99,7 @@ egyptians-in-cs.github.io/
 │   ├── scripts/                 # Python utilities for data management
 │   │   ├── lib.py               # Shared helpers
 │   │   ├── pipeline.py          # fetch / review / apply / refresh / status
-│   │   └── merge_interests.py   # Standardize research interests
+│   │   └── scholar.py           # Google Scholar lookups
 │   └── styles.css               # Global Tailwind styles
 ├── docs/                        # Production build for GitHub Pages
 ├── tailwind.config.js           # Tailwind configuration
