@@ -105,8 +105,11 @@ python3 scripts/download_token_gdrive.py
 DIRECTORY_SRC=/tmp/sandbox python3 scripts/pipeline.py fetch --no-download
 ```
 
-## Legacy scripts
+## Other scripts
 
-`populate.py`, `check_new_submissions.py`, `merge_new_submissions.py` and
-`google_scholar.py` are the previous pipeline, kept for reference only. Their headers
-say what replaced them.
+| script | what it is for |
+| --- | --- |
+| `download_token_gdrive.py` | refresh `token.json` so Drive photo links can be fetched |
+| `city_coords.py` | re-snap `locations.json` to city centres after new affiliations arrive |
+| `deploy.sh` | check, build and publish the site |
+| `openalex.py` | unused alternative metrics source, kept for reference |

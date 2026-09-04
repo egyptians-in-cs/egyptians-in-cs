@@ -41,6 +41,7 @@ testem.log
 .DS_Store
 Thumbs.db
 *.pyc
+__pycache__/
 token.json
 credentials.json
 download_token_gdrive.py

@@ -5,7 +5,7 @@ import openai
 import requests
 import argparse
 from tqdm import tqdm
-from populate import read_json, write_json
+from lib import read_json, write_json
 
 MAX_ATTEMPTS = 10
 API_KEY = os.getenv("OPENAI_API_SOCIAL")

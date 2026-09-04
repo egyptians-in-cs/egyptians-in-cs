@@ -97,8 +97,8 @@ egyptians-in-cs.github.io/
 │   │   ├── locations.json       # Affiliation to coordinates mapping
 │   │   └── images/              # Researcher photos (200+)
 │   ├── scripts/                 # Python utilities for data management
-│   │   ├── populate.py          # Process new submissions
-│   │   ├── google_scholar.py    # Update h-index/citations
+│   │   ├── lib.py               # Shared helpers
+│   │   ├── pipeline.py          # fetch / review / apply / refresh / status
 │   │   └── merge_interests.py   # Standardize research interests
 │   └── styles.css               # Global Tailwind styles
 ├── docs/                        # Production build for GitHub Pages
@@ -283,16 +283,18 @@ git push origin main
 ### Using Python Scripts
 
 ```bash
-# 1. Set the date filter in scripts/populate.py
-last_update = datetime.strptime("01/01/2026", "%m/%d/%Y")
-
-# 2. Run the update pipeline
 cd src
-python3 scripts/populate.py           # Process new submissions
-python3 scripts/check_new_submissions.py  # Validate entries
-python3 scripts/merge_new_submissions.py  # Merge into main file
-python3 scripts/google_scholar.py     # Update h-index/citations
+python3 scripts/pipeline.py status    # What state is the directory in
+python3 scripts/pipeline.py fetch     # Pull new submissions into review.json
+python3 scripts/pipeline.py review    # Read the proposals, edit them if needed
+python3 scripts/pipeline.py apply     # Merge the approved ones
+python3 scripts/pipeline.py refresh   # Update h-index/citations from Scholar
 ```
+
+There is no date filter to keep up to date: `pipeline.py` records which submissions
+it has already handled, and `fetch` never writes to the directory — it proposes
+changes in `assets/review.json` for you to approve. See
+[src/scripts/README.md](src/scripts/README.md) for the full description.
 
 ### Manual Update
 

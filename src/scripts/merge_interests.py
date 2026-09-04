@@ -1,4 +1,4 @@
-from populate import read_json
+from lib import read_json
 
 
 if __name__ == "__main__":
